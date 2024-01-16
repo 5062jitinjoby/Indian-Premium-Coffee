@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup Page</title>
+    
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="text-center mb-4"> 
+            <h2>Signup</h2>
+        </div>
+        <form method="post" action="/signup">
+        <div class="row justify-content-center align-items-center">
+            <div class="col-md-3">
+                <!-- First Name -->
+                <div class="form-group">
+                    <label for="firstName">First Name:</label>
+                    <input type="text" class="form-control" onkeyup="validateFName()" id="firstName" name="firstName" required>
+                </div>
+                
+                <!-- Last Name -->
+                <div class="form-group">
+                    <label for="lastName">Last Name:</label>
+                    <input type="text" class="form-control" onkeyup="validateLName()" id="lastName" name="lastName" required>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" class="form-control" onkeyup="validateEmail()" id="email" name="email" required>
+                    <button type="button" class="btn btn-danger btn-sm">verify</button>
+                </div>
+
+                <!-- Verify OTP -->
+                <div class="form-group">
+                    <label for="otp">Verify OTP:</label>
+                    <input type="text" class="form-control" id="otp" name="otp" required>
+                </div>
+            </div>
+
+            <div class="col-md-3 ml-5">
+                <!-- Country -->
+                <div class="form-group">
+                    <label for="country">Country:</label>
+                    <input type="text" class="form-control" id="country" name="country" required>
+                </div>
+
+                <!-- State -->
+                <div class="form-group">
+                    <label for="state">State:</label>
+                    <input type="text" class="form-control" id="state" name="state" required>
+                </div>
+
+                <!-- Phone Number -->
+                <div class="form-group">
+                    <label for="phoneNumber">Phone Number:</label>
+                    <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" required>
+                </div>
+
+                <!-- Pin Code -->
+                <div class="form-group">
+                    <label for="pincode">Pin Code:</label>
+                    <input type="text" class="form-control" id="pincode" name="pincode" required>
+                </div>
+            </div>
+        </div>
+    </form>
+
+        <div class="form-group mt-3 text-center"> 
+            <button type="submit" class="btn btn-primary">Signup</button>
+        </div>
+    </div>
+
+    <script>
+        function validateFName(){
+
+            var nameField = document.getElementById('firstName').value;
+
+            if(nameField.length == 0){
+
+                nameError.innerHTML='First Name is required';
+
+                return false;
+
+            }
+
+            if(!nameField.match(/^[A-Za-z]*/)){
+                nameError.innerHTML='Write valid name';
+                return false;
+            }
+            nameError.innerHTML='<i class="fa-solid fa-check"></i>';
+            return true;
+
+        }
+
+        function validateLName(){
+
+            var nameField = document.getElementById('lastName').value;
+
+            if(nameField.length == 0){
+
+                nameError.innerHTML='Last Name is required';
+
+                return false;
+
+            }
+
+            if(!nameField.match(/^[A-Za-z]*/)){
+                nameError.innerHTML='Write vaild name';
+                return false;
+            }
+            nameError.innerHTML='<i class="fa-solid fa-check"></i>';
+            return true;
+        }
+
+
+        function validateEmail(){
+
+            var emailField = document.getElementById('contact-email').value;
+
+            if(emailField.length==0)
+            {
+                emailError.innerHTML="Email is required";
+                return false;
+            }
+
+            if(!emailField.match(/^[A-Za-z\._\-0-9]*[@][A-Za-z]*[\.][a-z]{2,4}$/)){
+                emailError.innerHTML="invalid email";
+                return false;
+            }
+            else{
+                emailError.innerHTML='<i class="fa-solid fa-check"></i>';
+                return true;
+            }
+        }
+    </script>
+
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+
