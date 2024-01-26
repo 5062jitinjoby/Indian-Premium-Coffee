@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup Page</title>
+    
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="/public/js/validation.js" ></script>
+    <script src="/otp.js"></script>
+
+
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Indian Premium Coffee</a>
+        
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <a class="nav-link" href="#">Shop</a> 
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bag" viewBox="0 0 16 16">
+                    <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1m3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z"/>
+                  </svg>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-wallet2" viewBox="0 0 16 16">
+                    <path d="M12.136.326A1.5 1.5 0 0 1 14 1.78V3h.5A1.5 1.5 0 0 1 16 4.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 13.5v-9a1.5 1.5 0 0 1 1.432-1.499zM5.562 3H13V1.78a.5.5 0 0 0-.621-.484zM1.5 4a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5z"/>
+                  </svg>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+                    <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
+                  </svg>
+              </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+                        <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/>
+                      </svg>
+                </a>
+              </li>
+          </ul>
+        </div>
+      </nav>
+
+
+    <div class="container mt-5">
+        <div class="text-center mb-4"> 
+            <h2>Signup</h2>
+        </div>
+        <form method="post" action="/signup">
+        <div class="row justify-content-center align-items-center">
+            <div class="col-md-3">
+                <!-- First Name -->
+                <div class="form-group">
+                    <label for="firstName">First Name:</label>
+                    <input type="text" class="form-control" onkeyup="validateFName()" id="firstName" name="firstName" >
+                    <span class="error text tex-danger"  id="fnameError"></span>
+                </div>
+                
+                <!-- Last Name -->
+                <div class="form-group">
+                    <label for="lastName">Last Name:</label>
+                    <input type="text" class="form-control" onkeyup="validateLName()" id="lastName" name="lastName" required>
+                    <span class="error" id="lnameError"></span>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" class="form-control" onkeyup=validateEmail() id="email" name="email" required>
+                    <span class="error" id="emailError"></span>
+                    <!-- <button type="button" class="btn btn-danger btn-sm" onclick=getotp()>verify</button> -->
+                </div>
+
+                <!-- Verify OTP -->
+                <!-- <div class="form-group">
+                    <label for="otp">Verify OTP:</label>
+                    <input type="text" class="form-control"  id="otp" name="otp" required>
+                </div> -->
+            </div>
+
+            <div class="col-md-3 ml-5">
+                <!-- Country -->
+                <div class="form-group">
+                    <label for="country">Country:</label>
+                    <input type="text" class="form-control" onkeyup="validateCountry()" id="country" name="country" required>
+                    <span class="error" id="countryError"></span>
+                </div>
+
+                <!-- State -->
+                <div class="form-group">
+                    <label for="state">State:</label>
+                    <input type="text" class="form-control" onkeyup="validateState()" id="state" name="state" required>
+                    <span class="error" id="stateError"></span>
+                </div>
+
+                <!-- Phone Number -->
+                <div class="form-group">
+                    <label for="phoneNumber">Phone Number:</label>
+                    <input type="tel" class="form-control" onkeyup="validatePhnumber()" id="phoneNumber" name="phoneNumber" required>
+                    <span class="error" id="phNumberError"></span>
+                </div>
+
+
+            </div>
+        </div>
+         <!-- Password -->
+        <div class=" row justify-content-center align-items-center col-md-3">
+            <label for="password">Password:</label>
+            <input type="text" class="form-control" id="password" name="password" required>
+            <span class="error" id="pinError"></span>
+        </div> 
+        <div class="form-group mt-3 text-center"> 
+            <button type="submit" class="btn btn-primary">Signup</button>
+        </div>
+    </form>
+
+
+    </div>
+
+    
+    <script src="https://kit.fontawesome.com/your-font-awesome-kit.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+

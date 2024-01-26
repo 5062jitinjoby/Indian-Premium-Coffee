@@ -1,12 +1,43 @@
 const express = require('express')
 const userController = require('../controllers/userController')
-const router = express.Router()
+const router = express()
 
-router.get('/',userController.getL)
-router.get('/login',userController.getLogin)
-router.post('/login',userController.postLogin)
+const userLogin = (req,res,next)=>{
+    if(req.session.user){
+        next()
+    }
+    else{
+        res.redirect('/login')
+       
+    }
 
-router.get('/signup',userController.getsignup)
-router.post('/signup',userController.postsignup)
+
+
+}
+const userLogout= (req,res,next)=>{
+    if(req.session.user){
+        res.redirect("/home")
+    }
+    else
+    {
+        next()
+    }
+}
+
+router.set('view engine','ejs')
+// router.set('views','/views/user')
+
+router.get('/',userLogout,userController.getL)
+router.get('/login',userLogout,userController.getLogin)
+router.post('/login',userLogout,userController.postLogin)
+
+router.get('/signup',userLogin,userController.getsignup)
+router.post('/signup',userLogin,userController.postsignup)
+
+router.get('/otp',userLogin,userController.getOtp)
+router.post('/otp',userLogin,userController.postOtp)
+router.post('/resendotp',userLogin,userController.postResend)
+
+router.get('/home',userLogin,userController.getHome)
 
 module.exports = router;
