@@ -23,8 +23,9 @@
     <div class="screen-overlay"></div>
     <aside class="navbar-aside" id="offcanvas_aside">
         <div class="aside-top">
-            <a href="index.html" class="brand-wrap">
-                <img src="/public/imgs/theme/logo.svg" class="logo" alt="Evara Dashboard">
+            <a href="#" class="brand-wrap">
+                <h3>Indian Premium Coffee</h3>
+                <!-- <img src="/public/imgs/theme/logo.svg" class="logo" alt="Evara Dashboard"> -->
             </a>
             <div>
                 <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
@@ -106,7 +107,7 @@
                             <a class="dropdown-item" href="#"><i class="material-icons md-receipt"></i>Billing</a>
                             <a class="dropdown-item" href="#"><i class="material-icons md-help_outline"></i>Help center</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item text-danger" href="#"><i class="material-icons md-exit_to_app"></i>Logout</a>
+                            <a class="dropdown-item text-danger" href="/admin/logout"><i class="material-icons md-exit_to_app"></i>Logout</a>
                         </div>
                     </li>
                 </ul>
@@ -126,19 +127,23 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-3">
-                            <form method="post" action="/admin/category">
+                            <form method="post" action="/admin/category" onsubmit="validateForm(event)">
                                 <div class="mb-4">
                                     <label for="category_name" class="form-label">Name</label>
-                                    <input type="text" placeholder="Type here" class="form-control" id="name" name="name" />
+                                    <input type="text" placeholder="Type here" class="form-control" onkeyup="validateName()" id="name" name="name" />
+                                    <span class="error text tex-danger"  id="categoryError"></span>
                                 </div>
                                 <div class="mb-4">
                                     <label class="form-label">Description</label>
-                                    <textarea placeholder="Type here" class="form-control" id="description" name="description"></textarea>
+                                    <textarea placeholder="Type here" class="form-control" id="description" onkeyup="validateDescription()" name="description"></textarea>
+                                    <span class="error text tex-danger"  id="desError"></span>
                                 </div>
                                 <div class="d-grid">
                                     <button class="btn btn-primary">Create category</button>
                                 </div>
                             </form>
+                            <span class="text-danger" id="submitError"> </span>
+                            <span class="text-danger"><%= message %></span>
                         </div>
                         <div class="col-md-9">
                             <div class="table-responsive">
@@ -148,6 +153,7 @@
                                             </th>
                                             <th>Name</th>
                                             <th>Description</th>
+                                            <th>Status</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -157,18 +163,23 @@
                                             <tr>
                                                 <td><%= category.name%></td>
                                                 <td><%= category.description%></td>
-                                                <td>
-                                                    <a href="">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen mr-3" viewBox="0 0 16 16">
-                                                        <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001m-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708l-1.585-1.585z"/>
-                                                      </svg>
+                                                <td><a href="/admin/category_Status/?id=<%=category._id%>">
+                                                    <%if(category.isActive==true){%>
+                                                        <span class="badge rounded-pill alert-success">Active</span>
+                                                    <%}else{%>
+                                                        <span class="badge rounded-pill alert-danger">Blocked</span>        
+                                                    <%}%> 
                                                     </a>
-                                                    <a href="">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                                                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
-                                                            <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
-                                                          </svg>
+                                                </td>
+                                                <td>
+                                                    <div class="col-lg-12 col-sm-12 col-12 col-action ">
+                                                        <a href="/admin/edit_category/?id=<%= category._id%>" class="btn btn-sm font-sm rounded btn-brand">
+                                                            <i class="material-icons md-edit"></i> Edit
                                                         </a>
+                                                        <a href="/admin/del_category/?id=<%= category._id%>" class="btn btn-sm font-sm btn-light rounded">
+                                                            <i class="material-icons md-delete_forever"></i> Delete
+                                                        </a>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         <% }) %>
@@ -181,7 +192,7 @@
                 </div> <!-- card body .// -->
             </div> <!-- card .// -->
         </section> <!-- content-main end// -->
-        <a class="btn btn-danger" href="/admin/logout">Logout</a>
+        
         <footer class="main-footer font-xs">
             <div class="row pb-30 pt-15">
                 <div class="col-sm-6">
@@ -197,6 +208,7 @@
             </div>
         </footer>
     </main>
+    <script src="/public/js/categoryValidation.js"></script>
     <script src="/public/js/vendors/jquery-3.6.0.min.js"></script>
     <script src="/public/js/vendors/bootstrap.bundle.min.js"></script>
     <script src="/public/js/vendors/select2.min.js"></script>

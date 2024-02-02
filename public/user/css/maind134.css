@@ -9919,6 +9919,9 @@ span.fi-rs-apps {
     padding: 30px;
   }
 }
+.login{
+  width:30%
+}
 
 .zoomContainer{ z-index: 9999;}
 .zoomWindow{ z-index: 9999;}

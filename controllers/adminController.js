@@ -23,6 +23,11 @@ const adminController ={
         }   
     },
 
+    logout:(req,res)=>{
+        req.session.destroy();
+        res.redirect('/admin/login')
+    },
+
     //admin dashboard
     home:(req,res)=>{
         res.render('admin/home')
@@ -36,6 +41,46 @@ const adminController ={
         catch(error) {
             console.log(error);
             res.send('Sever error');
+        }
+    },
+    user_Status:async(req,res)=>{
+        try {
+            const id = req.query.id
+            const user = await User.findOne({ _id: id })
+            let status;
+            if (user.isActive == true) {
+                status = false
+            }
+            else {
+                status = true
+            }
+            console.log(status)
+            await User.findByIdAndUpdate({ _id: id }, { $set: { isActive: status } })
+            res.redirect('/admin/view_user')
+        }
+        catch (error) {
+            console.log(error.message)
+        }
+    },
+    getEdit_User:async(req,res)=>{
+        try{
+            const usid = req.query.id;
+            req.session.usid = usid;
+            const user = await User.findOne({_id:usid})
+            res.render('admin/edit_User',{user})
+        }
+        catch(error){
+            console.log(error.message)
+        }
+    },
+    postEdit_User:async(req,res)=>{
+        try{
+            const usid = req.session.usid;
+            const {fname,lname,email,country,state,PhNumber} = req.body
+            const user = await User.findOneAndUpdate({_id:usid},{$set:{fname:fname,lname:lname,email:email,country:country,state:state,phNumber:PhNumber}})
+        }
+        catch(error){
+            console.log(error.message)
         }
     }
 }

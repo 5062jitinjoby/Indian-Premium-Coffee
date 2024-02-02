@@ -23,8 +23,9 @@
     <div class="screen-overlay"></div>
     <aside class="navbar-aside" id="offcanvas_aside">
         <div class="aside-top">
-            <a href="index.html" class="brand-wrap">
-                <img src="/public/imgs/theme/logo.svg" class="logo" alt="Evara Dashboard">
+            <a href="#" class="brand-wrap">
+                <h3>Indian Premium Coffee</h3>
+                <!-- <img src="/public/imgs/theme/logo.svg" class="logo" alt="Evara Dashboard"> -->
             </a>
             <div>
                 <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
@@ -126,57 +127,23 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-3">
-                            <form method="post" action="/admin/flavours" onsubmit="validateForm(event)">
+                            <form method="post" action="/admin/edit_flavours" onsubmit="validateForm(event)">
                                 <div class="mb-4">
                                     <label for="product_name" class="form-label">Name</label>
-                                    <input type="text" placeholder="Type here" class="form-control" id="flavourName" onkeyup="validateName()" name="flavourName" />
+                                    <input type="text" placeholder="Type here" class="form-control" id="flavourName" onkeyup="validateName()" value="<%= flavour.name%>" name="name" />
                                     <span class="error text tex-danger"  id="flavourError"></span>
                                 </div>
                                 <div class="mb-4">
                                     <label class="form-label">Description</label>
-                                    <textarea placeholder="Type here" class="form-control" id="flavourDes" name="flavourDes" onkeyup="validateDescription()"></textarea>
+                                    <textarea placeholder="Type here" class="form-control" id="description" onkeyup="validateDescription()" value="<%= flavour.description%>" name="description"><%= flavour.description%></textarea>
                                     <span class="error text tex-danger"  id="desError"></span>
                                 </div>
                                 <div class="d-grid">
-                                    <button class="btn btn-primary">Create Flavour</button>
+                                    <button class="btn btn-primary">Update Flavour</button>
                                 </div>
                             </form>
                             <span class="text-danger" id="submitError"> </span>
-                            <span class="text-danger"><%= message %></span>
                         </div>
-                        <div class="col-md-9">
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Description</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <%if(flavours){%>
-                                    <tbody>
-                                        <%flavours.forEach(flavour=>{%>
-                                        <tr>
-                                            <td><%= flavour.name%></td>
-                                            <td><%= flavour.description%></td>
-                                            <td>
-                                                <div class="col-lg-12 col-sm-12 col-12 col-action ">
-                                                    <a href="/admin/edit_flavours/?id=<%=flavour._id%>" class="btn btn-sm font-sm rounded btn-brand">
-                                                        <i class="material-icons md-edit"></i> Edit
-                                                    </a>
-                                                    <a href="/admin/del_flavour/?id=<%=flavour._id%>" class="btn btn-sm font-sm btn-light rounded">
-                                                        <i class="material-icons md-delete_forever"></i> Delete
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    <% }) %>
-                                    </tbody>
-                                    <% } %>
-                                </table>
-                            </div>
-                        </div> <!-- .col// -->
                     </div> <!-- .row // -->
                 </div> <!-- card body .// -->
             </div> <!-- card .// -->
