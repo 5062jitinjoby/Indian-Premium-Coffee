@@ -10,7 +10,7 @@ const userController ={
         res.redirect('/login')
     },
     getLogin:(req,res)=>{
-        res.render('user/login')
+        res.render('user/login',{message:''})
     },
     postLogin:async (req,res)=>{
         try{
@@ -19,38 +19,40 @@ const userController ={
             const password = req.body.password
             const verified = await bcrypt.compare(password,hashed)
             if(verified && userData.isActive == true){
-                req.session.user=userData.fname
+                req.session.user=userData._id
                 res.redirect('/home')
             }
             else{
-                res.send('Wrong password')
+                res.render('user/login',{message:'Wrong password'})
             }
         }
         catch{
-            res.send('Invalid Credentials')
+            res.render('user/login',{message:'Invalid Credentials'})
         }   
+    },
+
+    logout:(req,res)=>{
+        req.session.destroy();
+        res.redirect('/login')
     },
 
     //signUp
     getsignup:(req,res)=>{
-        res.render('user/signup')
+        res.render('user/signup',{message:''})
     },
     postsignup:async (req,res)=>{
         try{
             const check = await User.findOne({email:req.body.email});
             if(check && check.isActive == true){
-                res.send('user already exists')
+                res.render('user/signup',{message:'User already exists'})
             }
             else{
 
                 let data = {
-                fname:req.body.firstName,
-                lname:req.body.lastName,
+                username:req.body.username,
                 password:await bcrypt.hash(req.body.password,saltround),
                 email:req.body.email,
-                country:req.body.country,
-                state:req.body.state,
-                phNumber:req.body.phoneNumber
+                phoneNumber:req.body.phoneNumber
                 }
                 const userData = await User.create(data)
                 const uid = userData._id;
@@ -82,12 +84,6 @@ const userController ={
         let otp = req.session.otp;
         let uid = req.session.uid;
         let data = User.findOne({_id:uid})
-        if(data.isActive!=true){
-            setTimeout(()=>{
-                User.findOneAndDelete({_id:req.session.uid})
-                res.redirect('/signup')
-            },30000)
-        }
         try{
             if(otp == req.body.otp){
                 await User.updateOne({_id:uid},{$set:{isActive:true}})
@@ -98,9 +94,9 @@ const userController ={
 
             } 
         }
-        catch{
+        catch(error){
             await User.findOneAndDelete({_id:req.session.uid})
-            res.send('database error')
+            console.log(error.message)
         }  
     },
 
@@ -110,8 +106,21 @@ const userController ={
 
     getHome:async(req,res)=>{
         try{
-            const products = await Products.find()
-            res.render('user/home',{products})
+            const user = await User.findOne({_id:req.session.user}) 
+            const products = await Products.find().populate('category')
+            res.render('user/home',{products,user})
+        }
+        catch(error){
+            console.log(error.message)
+        }
+    },
+
+    productDetails:async(req,res)=>{
+        try{
+            const user = await User.findOne({_id:req.session.user}) 
+            const uid = req.query.id;
+            const product = await Products.findOne({_id:uid})
+            res.render('user/productDetails',{product,user})
         }
         catch(error){
             console.log(error.message)

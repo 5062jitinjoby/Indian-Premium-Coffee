@@ -23,8 +23,9 @@
     <div class="screen-overlay"></div>
     <aside class="navbar-aside" id="offcanvas_aside">
         <div class="aside-top">
-            <a href="index.html" class="brand-wrap">
-                <img src="/public/imgs/theme/logo.svg" class="logo" alt="Evara Dashboard">
+            <a href="#" class="brand-wrap">
+                <h3>Indian Premium Coffee</h3>
+                <!-- <img src="/public/imgs/theme/logo.svg" class="logo" alt="Evara Dashboard"> -->
             </a>
             <div>
                 <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
@@ -48,8 +49,8 @@
                     </a>
                     <div class="submenu">
                         <a href="/admin/productList">Product List</a>
-                        <a href="/admin/category">Categories</a>
-                        <a href="/admin/flavours" class="active">Flavours</a>
+                        <a href="/admin/category" class="active">Categories</a>
+                        <a href="/admin/flavours">Flavours</a>
                     </div>
                 </li>
                 <li class="menu-item ">
@@ -106,7 +107,6 @@
                             <a class="dropdown-item" href="#"><i class="material-icons md-receipt"></i>Billing</a>
                             <a class="dropdown-item" href="#"><i class="material-icons md-help_outline"></i>Help center</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item text-danger" href="/admin/logout"><i class="material-icons md-exit_to_app"></i>Logout</a>
                         </div>
                     </li>
                 </ul>
@@ -115,8 +115,8 @@
         <section class="content-main">
             <div class="content-header">
                 <div>
-                    <h2 class="content-title card-title">Flavours</h2>
-                    <p>Add, edit or delete a flavour</p>
+                    <h2 class="content-title card-title">Categories </h2>
+                    <p>Add, edit or delete a category</p>
                 </div>
                 <div>
                     <input type="text" placeholder="Search Categories" class="form-control bg-white">
@@ -124,63 +124,30 @@
             </div>
             <div class="card">
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <form method="post" action="/admin/flavours" onsubmit="validateForm(event)">
+                    <div class="row align-items-center">
+                        <div class="col-md-6 mx-auto ">
+                            <form method="post" action="/admin/edit_category" onsubmit="validateForm(event)">
                                 <div class="mb-4">
-                                    <label for="product_name" class="form-label">Name</label>
-                                    <input type="text" placeholder="Type here" class="form-control" id="flavourName" onkeyup="validateName()" name="flavourName" />
-                                    <span class="error text tex-danger"  id="flavourError"></span>
+                                    <label for="category_name" class="form-label">Name</label>
+                                    <input type="text"  class="form-control" id="name" value="<%= category.name%>" onkeyup="validateName()" name="name" />
+                                    <span class="error text tex-danger"  id="categoryError"></span>
                                 </div>
                                 <div class="mb-4">
                                     <label class="form-label">Description</label>
-                                    <textarea placeholder="Type here" class="form-control" id="flavourDes" name="flavourDes" onkeyup="validateDescription()"></textarea>
+                                    <textarea class="form-control" id="description" name="description" onkeyup="validateDescription()" value="<%= category.description%>"><%= category.description%></textarea>
                                     <span class="error text tex-danger"  id="desError"></span>
                                 </div>
                                 <div class="d-grid">
-                                    <button class="btn btn-primary">Create Flavour</button>
+                                    <button class="btn btn-primary">Update category</button>
                                 </div>
                             </form>
                             <span class="text-danger" id="submitError"> </span>
-                            <span class="text-danger"><%= message %></span>
                         </div>
-                        <div class="col-md-9">
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Description</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <%if(flavours){%>
-                                    <tbody>
-                                        <%flavours.forEach(flavour=>{%>
-                                        <tr>
-                                            <td><%= flavour.name%></td>
-                                            <td><%= flavour.description%></td>
-                                            <td>
-                                                <div class="col-lg-12 col-sm-12 col-12 col-action ">
-                                                    <a href="/admin/edit_flavours/?id=<%=flavour._id%>" class="btn btn-sm font-sm rounded btn-brand">
-                                                        <i class="material-icons md-edit"></i> Edit
-                                                    </a>
-                                                    <a href="/admin/del_flavour/?id=<%=flavour._id%>" class="btn btn-sm font-sm btn-light rounded">
-                                                        <i class="material-icons md-delete_forever"></i> Delete
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    <% }) %>
-                                    </tbody>
-                                    <% } %>
-                                </table>
-                            </div>
-                        </div> <!-- .col// -->
                     </div> <!-- .row // -->
                 </div> <!-- card body .// -->
             </div> <!-- card .// -->
         </section> <!-- content-main end// -->
+        
         <footer class="main-footer font-xs">
             <div class="row pb-30 pt-15">
                 <div class="col-sm-6">
@@ -196,7 +163,7 @@
             </div>
         </footer>
     </main>
-    <script src="/public/js/flavourValidation.js"></script>
+    <script src="/public/js/categoryValidation.js"></script>
 
     <script src="/public/js/vendors/jquery-3.6.0.min.js"></script>
     <script src="/public/js/vendors/bootstrap.bundle.min.js"></script>
