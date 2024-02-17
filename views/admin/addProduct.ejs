@@ -139,7 +139,7 @@
                                         <div class="mb-4">
                                             <label class="form-label">Name</label>
                                             <input type="text" placeholder="Type here" class="form-control" id="name" onkeyup="validateName()" name="name">
-                                            <span class="error text tex-danger"  id="productError"></span>
+                                            <span class="error text text-danger"  id="productError"></span>
                                         </div>
                                     </div> <!-- col.// -->
                                 </div> <!-- row.// -->
@@ -152,7 +152,7 @@
                                         <div class="mb-4">
                                             <label class="form-label">About</label>
                                             <textarea placeholder="Type here" class="form-control" rows="4" id="description" onkeyup="validateDescription()" name="description"></textarea>
-                                            <span class="error text tex-danger"  id="desError"></span>
+                                            <span class="error text text-danger"  id="desError"></span>
                                         </div>
                                     </div> <!-- col.// -->
                                 </div> <!-- row.// -->
@@ -165,7 +165,7 @@
                                         <div class="mb-4">
                                             <label class="form-label">Cost (in Rs)</label>
                                             <input type="number" placeholder="00.0" class="form-control" id="price" onkeyup="validatePrice()" name="price">
-                                            <span class="error text tex-danger"  id="priceError"></span>
+                                            <span class="error text text-danger"  id="priceError"></span>
                                         </div>
                                     </div> <!-- col.// -->
                                 </div> <!-- row.// -->
@@ -178,7 +178,7 @@
                                         <div class="mb-4">
                                             <label class="form-label">Number</label>
                                             <input type="number" placeholder="0" class="form-control" id="quantity" onkeyup="validateQuantity()" name="quantity">
-                                            <span class="error text tex-danger"  id="quantityError"></span>
+                                            <span class="error text text-danger"  id="quantityError"></span>
                                         </div>
                                     </div> <!-- col.// -->
                                 </div> <!-- row.// -->
@@ -197,7 +197,7 @@
                                                     <% }) %>
                                                 <%  } %>
                                             </select>
-                                            <span class="error text tex-danger"  id="categoryError"></span>
+                                            <span class="error text text-danger"  id="categoryError"></span>
                                         </div>
                                     </div> <!-- col.// -->
                                 </div> <!-- row.// -->
@@ -216,7 +216,7 @@
                                                     <% }) %>
                                                 <%  } %>
                                             </select>
-                                            <span class="error text tex-danger"  id="flavourError"></span>
+                                            <span class="error text text-danger"  id="flavourError"></span>
                                         </div>
                                     </div> <!-- col.// -->
                                 </div> <!-- row.// -->
@@ -228,7 +228,8 @@
                                     <div class="col-md-9">
                                         <div class="mb-4">
                                             <label class="form-label">Images</label>
-                                            <input class="form-control" type="file" onchange="validateImage()" name="images" multiple>
+                                            <input class="form-control" type="file" onchange="previewImages(input)" name="images" multiple>
+                                            <div id="imagePreviewContainer" class="mt-2"></div>
                                         </div>
                                     </div> <!-- col.// -->
                                 </div> <!-- .row end// -->
@@ -258,6 +259,31 @@
             </div>
         </footer>
     </main>
+
+    <script>
+        function previewImages(input) {
+            var imagePreviewContainer = document.getElementById('imagePreviewContainer');
+            imagePreviewContainer.innerHTML = ''; // Clear previous previews
+        
+            if (input.files) {
+                for (var i = 0; i < input.files.length; i++) {
+                    var reader = new FileReader();
+        
+                    reader.onload = function (e) {
+                        var imgElement = document.createElement('img');
+                        imgElement.src = e.target.result;
+                        imgElement.style.maxWidth = '100px'; // Set the maximum width for the preview image
+                        imgElement.style.marginRight = '5px'; // Add some margin between images
+                        imagePreviewContainer.appendChild(imgElement);
+                    };
+        
+                    reader.readAsDataURL(input.files[i]);
+                }
+            }
+        }
+    </script>
+
+
     <script src="/public/js/productValidation.js"></script>
 
     <script src="/public/js/vendors/jquery-3.6.0.min.js"></script>

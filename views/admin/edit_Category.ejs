@@ -126,7 +126,8 @@
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-md-6 mx-auto ">
-                            <form method="post" action="/admin/edit_category" onsubmit="validateForm(event)">
+                            <form method="post" action="/admin/edit_category?_method=PUT" onsubmit="validateForm(event)">
+                                <input type="hidden" name="_method" value="PUT">
                                 <div class="mb-4">
                                     <label for="category_name" class="form-label">Name</label>
                                     <input type="text"  class="form-control" id="name" value="<%= category.name%>" onkeyup="validateName()" name="name" />
@@ -142,6 +143,7 @@
                                 </div>
                             </form>
                             <span class="text-danger" id="submitError"> </span>
+                            <span class="text-danger"><%= message%></span>
                         </div>
                     </div> <!-- .row // -->
                 </div> <!-- card body .// -->
