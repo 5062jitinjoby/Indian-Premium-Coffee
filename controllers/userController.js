@@ -1,5 +1,7 @@
 const User = require('../models/user')
 const Products = require('../models/products')
+const Address = require('../models/address')
+const Orders = require('../models/orders')
 const getotp = require('../otp')
 const bcrypt = require('bcrypt')
 const saltround=10;
@@ -109,6 +111,81 @@ const userController ={
             const user = await User.findOne({_id:req.session.user}) 
             const products = await Products.find().populate('category')
             res.render('user/home',{products,user})
+        }
+        catch(error){
+            console.log(error.message)
+        }
+    },
+
+    getProfile:async(req,res)=>{
+        try{
+            const uid = req.session.user
+            const user = await User.findOne({_id:uid})
+            res.render('user/userProfile',{user})
+        }
+        catch(error){
+            console.log(error.message);
+        }
+    },
+
+    getAddAddress:async(req,res)=>{
+        try{
+            res.render('user/userAddAddress')
+        }
+        catch(error){
+            console.log(error)
+        }
+    },
+
+    postAddAddress:async(req,res)=>{
+        try{
+            const{name,mobile,pincode,locality,address,city,state,country}=req.body
+            //console.log(`name:${name},mobile:${mobile},pincode:${pincode},locality:${locality},address:${address},city:${city},state:${state},country:${country}`)
+            const uid = req.session.user;
+            const usradd = await Address.findOne({userID:uid})
+            if(usradd){
+                const addAddress =  await Address.findOneAndUpdate({userID:uid},
+                    {$push:{addresses:{Name:name,Mobile:mobile,Pincode:pincode,Locality:locality,Address:address,City:city,State:state,Country:country}}},{new:true})
+            }
+            else{
+                const addAddress =  await Address.create({userID:uid},
+                    {addresses:[{Name:name,Mobile:mobile,Pincode:pincode,Locality:locality,Address:address,City:city,State:state,Country:country}]})
+                    console.log(addAddress)
+            }
+            
+        }
+        catch(error){
+            console.log(error)
+        }
+    },
+
+    getAddress:async(req,res)=>{
+        try{
+            const uid = req.session.user;
+            const address = await Address.findOne({userID:uid})
+            console.log(address.addresses[0].Name)
+            res.render('user/userAddress',{address})
+        }
+        catch(error){
+            console.log(error.message);
+        }
+    },
+
+    getOrders:async(req,res)=>{
+        try{
+            const uid = req.session.user;
+            const orders = await Orders.findOne({userID:uid}).populate('orders.products.productID')
+            const reqorder = orders.orders.map(pr=>{
+                console.log(pr)
+            })
+            // orders.orders.forEach(pr=>{
+            //     pr.products.forEach(el=>{
+            //         console.log(el.productID.ProductName)
+            //     })
+                
+            // })
+            
+            res.render('user/userOrders',{orders})
         }
         catch(error){
             console.log(error.message)

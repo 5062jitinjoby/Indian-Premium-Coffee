@@ -2,6 +2,7 @@ const express = require('express')
 const path =require("path")
 const session = require('express-session')
 const nocache = require('nocache')
+const methodOverride = require('method-override')
 
 const connectDB = require('./db')
 const config = require('./config')
@@ -11,7 +12,8 @@ connectDB();
 
 
 app.use('/public',express.static(path.join(__dirname,"/public")));
-app.use('/uploads',express.static(path.join(__dirname,"/uploads")))
+app.use('/uploads',express.static(path.join(__dirname,"/uploads")));
+app.use(methodOverride('_method'));
 const userRoute = require('./routers/userRoute')
 const adminRoute = require('./routers/adminRoute')
 

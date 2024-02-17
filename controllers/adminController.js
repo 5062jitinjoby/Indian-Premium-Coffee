@@ -5,7 +5,7 @@ const adminController ={
 
     // admin Login
     getLogin:(req,res)=>{
-        res.render('admin/login')
+        res.render('admin/login',{message:''})
     },
     postLogin:async (req,res)=>{
         try{
@@ -15,7 +15,7 @@ const adminController ={
                 res.redirect('/admin/home')
             }
             else{
-                res.send('Wrong password')
+                res.render('admin/login',{message:'Wrong password'})
             }
         }
         catch{

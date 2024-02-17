@@ -95,6 +95,39 @@ function validateImage(){
     return flag;
 }
 
+// function loadMain(event,preview1)
+// {   
+
+//     if(preview1.hasChildNodes())
+//     {
+//         while(preview1.firstChild)
+//         {
+//             preview1.removeChild(preview1.firstChild)
+//         }
+//     }
+//     const files = event.target.files
+//     console.log(files)
+    
+//     if(files && files[0])
+//     {
+//         const reader = new FileReader()
+
+//         reader.onload = function (e)
+//         {
+  
+//             mainpre = document.createElement('img')
+//             mainpre.style.aspectRatio = '1/1'
+//             mainpre.style.width = "200px"
+//             mainpre.style.height = "200px"
+//             mainpre.id = 'previewmain'
+//             mainpre.src = e.target.result
+//             preview1.appendChild(mainpre)
+//         }
+
+//         reader.readAsDataURL(files[0])
+//     }
+// }
+
 
 function validateForm(event){
 
@@ -107,6 +140,7 @@ function validateForm(event){
     validateImage()
 
     if(!validateName() || !validateDescription() || !validatePrice() || !validateQuantity() || !validateCategory() || !validateFlavour() || !validateImage()){
+        console.log('product validation')
         event.preventDefault()
         var submitError = document.getElementById('submitError');
         submitError.innerHTML="Please fix these error to submit ";

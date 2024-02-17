@@ -79,9 +79,9 @@ function validateForm(event)
 {
     console.log('validate form')
 
-console.log(validateUserame(),validateEmail(),validatePhnumber())
+console.log(validateUsername(),validateEmail(),validatePhnumber())
 
-if(!validateUserame() || !validateEmail() || !validatePhnumber()){
+if(!validateUsername() || !validateEmail() || !validatePhnumber()){
     event.preventDefault()
 var submitError = document.getElementById('submitError');
 submitError.innerHTML="Please fix these error to submit ";

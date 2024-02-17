@@ -22,6 +22,7 @@ const categories = {
                     name:req.body.name,
                     description:req.body.description
                 }
+                data.name.trim()
                 await Category.create(data)
                 res.redirect('/admin/category')
             }
@@ -38,7 +39,7 @@ const categories = {
             console.log(uid)
             req.session.catid = uid;
             const category = await Category.findOne({_id:uid})
-            res.render("admin/edit_Category",{category})
+            res.render("admin/edit_Category",{category,message:''})
         }
         catch(error){
             console.log(error.message)
@@ -48,9 +49,27 @@ const categories = {
         try{
             const uid = req.session.catid
             const { name, description} = req.body
-            const category = await Category.findOneAndUpdate({_id:uid},{$set:{ name: name, description: description}})
-            console.log(category)
-            res.redirect("/admin/category")
+            let category = await Category.findOne({_id:uid})
+            const catname = name.trim()
+            console.log(catname);
+            if(catname != category.name){
+                const ucat = await Category.findOne({name:catname})
+                console.log(ucat)
+                if(!ucat){
+                    category = await Category.findOneAndUpdate({_id:uid},{$set:{ name: catname, description: description}})
+                    res.redirect('/admin/category')
+                }
+                else{
+                    res.render("admin/edit_Category",{category,message:'Category already exists'})
+                }  
+            }
+            else{
+                category = await Category.findOneAndUpdate({_id:uid},{$set:{ name: catname, description:description}})
+                res.redirect('/admin/category')
+                console.log(category)
+            }
+            
+            
         }
         catch(error){
             console.log(error.message)

@@ -83,19 +83,19 @@
                                         </div>
                                         <form method="post" action="/signup" id="form" onsubmit="validateForm(event)">
                                             <div class="form-group">
-                                                <input type="text" required="" name="username" id="username" onkeyup="validateUsername()" placeholder="Username">
-                                                <span class="error text tex-danger"  id="usernameError"></span>
+                                                <input type="text" name="username" id="username" onkeyup="validateUsername()" placeholder="Username">
+                                                <span class="error text text-danger"  id="usernameError"></span>
                                             </div>
                                             <div class="form-group">
-                                                <input type="text" required="" name="email" id="email" onkeyup="validateEmail()" placeholder="Email">
-                                                <span class="error text tex-danger"  id="emailError"></span>
+                                                <input type="text" name="email" id="email" onkeyup="validateEmail()" placeholder="Email">
+                                                <span class="error text text-danger"  id="emailError"></span>
                                             </div>
                                             <div class="form-group">
-                                                <input required="" type="password" name="password" id="password" placeholder="Password">
+                                                <input  type="password" name="password" id="password" placeholder="Password">
                                             </div>
                                             <div class="form-group">
-                                                <input required="" type="tel" name="phoneNumber" id="phoneNumber" onkeyup="validatePhnumber()" placeholder="Phone Number">
-                                                <span class="error text tex-danger"  id="phNumberError"></span>
+                                                <input type="tel" name="phoneNumber" id="phoneNumber" onkeyup="validatePhnumber()" placeholder="Phone Number">
+                                                <span class="error text text-danger"  id="phNumberError"></span>
                                             </div>
                                             <div class="form-group text-center">
                                                 <button type="submit" class="btn btn-fill-out btn-block hover-up" name="login">Submit &amp; Signup</button>
