@@ -86,6 +86,20 @@ function validateCity(){
     return true;
 }
 
+function validateLocality(){
+    var locality = document.getElementById('locality').value;
+    if(locality.length == 0){
+        localityError.innerHTML='Locality is required';
+        return false;
+    }
+    if(!locality.match(/[A-Za-z]{1,}/)){
+        localityError.innerHTML='Enter valid locality';
+        return false;
+    }
+    localityError.innerHTML='<i class="fa-solid fa-check"></i>';
+    return true;
+}
+
 function validateState(){
     var state = document.getElementById('state').value;
     if(state.length == 0){
@@ -104,9 +118,16 @@ function addAddress(event)
 {
     console.log('validate form')
 
-console.log(validateUsername(),validatePhnumber())
+validateUsername()
+validatePhnumber()
+validateAddress()
+validateCity()
+validateCountry()
+validatePin()
+validateState()
+validateLocality()
 
-if(!validateUsername() ||  !validatePhnumber() ||!validateAddress() || !validateCity()
+if(!validateUsername() ||  !validatePhnumber() ||!validateAddress() || !validateLocality() || !validateCity()
     || !validateCountry() || !validatePin() || !validateState()){
     event.preventDefault()
     console.log('prevent default')

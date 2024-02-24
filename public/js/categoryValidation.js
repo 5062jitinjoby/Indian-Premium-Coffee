@@ -30,6 +30,9 @@ function validateDescription(){
 }
 
 function validateForm(event){
+    validateName();
+    validateDescription();
+
     if(!validateName() || !validateDescription()){
         event.preventDefault()
         var submitError = document.getElementById('submitError');

@@ -47,6 +47,20 @@ function validatePhnumber(){
     return true;
 }
 
+function validatePassword(){
+    var password = document.getElementById('password').value;
+    if(password.length == 0){
+        passwordError.innerHTML='Password is required';
+        return false;
+    }
+    if(!password.match(/^(?=.*\d)(?=.*[a-z])(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)){
+        passwordError.innerHTML='Write valid Password';
+        return false;
+    }
+    passwordError.innerHTML='<i class="fa-solid fa-check"></i>';
+    return true;
+}
+
 // function validateCountry(){
 //     var country = document.getElementById('country').value;
 //     if(country.length == 0){
@@ -79,9 +93,9 @@ function validateForm(event)
 {
     console.log('validate form')
 
-console.log(validateUsername(),validateEmail(),validatePhnumber())
+console.log(validateUsername(),validateEmail(),validatePhnumber(),validatePassword())
 
-if(!validateUsername() || !validateEmail() || !validatePhnumber()){
+if(!validateUsername() || !validateEmail() || !validatePhnumber() || !validatePassword()){
     event.preventDefault()
 var submitError = document.getElementById('submitError');
 submitError.innerHTML="Please fix these error to submit ";

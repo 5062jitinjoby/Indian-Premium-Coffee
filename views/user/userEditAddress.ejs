@@ -22,16 +22,16 @@
             margin: 15px 5px;
         }
     </style>
+    <script src="/public/js/checkoutValidation.js"></script>
 </head>
 
 <body>
-    <%-include('userheader.ejs')%>   
-    <div class="container d-flex" id="parentContainer">
-        <!-- Menu -->
-        <div class="layout-menu-container" style="background-color: rgba(0, 0,0, 0.03);">
-        <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
-           
-               <ul class="menu-inner py-1">
+    <%-include('userheader.ejs')%>  
+    <div class="container-fluid d-flex" style="height: 100vh;">
+        <!-- Side Menu -->
+        <div class="layout-menu-container" style="background-color: rgba(0, 0, 0, 0.03);">
+            <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+                <ul class="menu-inner py-1">
                  <!-- Dashboard -->
                  <li style="border-top: none;" class="menu-item  ">
                    <a href="/profile" class="menu-link">
@@ -44,13 +44,14 @@
                  <li class="menu-item ">
                     <a href="/addresses" class="menu-link">
                         <i class="menu-icon tf-icons fa-solid fa-address-book"></i>
-                        <h6>Addresses</h6> 
+                        <h6>Address</h6> 
                     </a>
                 </li>
+                <span class="line"></span>
                  <li class="menu-item ">
                    <a href="/addAddress" class="menu-link">
                        <i class="menu-icon tf-icons fa-solid fa-address-book"></i>
-                       <h6>Add Addresses</h6> 
+                       <h6>Add Address</h6> 
                    </a>
                </li>
                <span class="line"></span>
@@ -61,12 +62,12 @@
                     <i class="menu-icon fa-solid fa-rectangle-list"></i>
                     <h6>Orders</h6>
                 </a>
-                </li>
+            </li>
             <span class="line"></span>
         
                <!-- Orders -->
                <!-- <li class="menu-item ">
-                <a href="" class="menu-link">
+                <a href="/profile/wishlist" class="menu-link">
                     <i class="menu-icon fa-solid fa-heart"></i>
                     <h6>Wishlist</h6>
                 </a>
@@ -93,51 +94,88 @@
                </li>
                
                </ul>
-             </aside>
+            </aside>
         </div>
-        <!-- / Menu -->
     
-        <!-- address Details -->
-        <div class="greeting d-flex flex-column align-items-center justify-content-center" style="width: 100%;">
-            <h4 class="mb-6 p-3 pl-4 shadow-sm" style="background-color: rgba(0, 0,0, 0.03);">Orders</h4>
-        
-            <% orders.orders.forEach(order => { %>
-                <div class="border bg container">
-                    <h4 class="mb-3"><span class="fs-6 me-2">Order Date: <%= (new Date(order.date)).toLocaleDateString('en-GB') %></span></h4>
-        
-                    <% order.products.forEach(product => { %>
-                        <div class="card mb-3">
-                            <div class="card-body d-flex align-items-start">
-                                <img src="/uploads/<%= product.productID.image[0] %>" alt="<%= product.productID.ProductName %>" class="me-3" style="max-width: 100px; max-height: 100px; object-fit: cover;">
-        
-                                <div>
-                                    <h5 class="card-title"><%= product.productID.ProductName %></h5>
-                                    <p class="card-text">Quantity: <%= product.quantity %></p>
-                                    <p class="card-text">Price: $<%= product.cost %></p>
+        <!-- Add New Address Form -->
+        <div class="container d-flex flex-column justify-content-center align-items-center">
+            <div class="card mb-3" style="width: 90%;">
+                <div class="card-header" style="background-color: rgba(0, 0, 0, 0.03);">
+                    <h4 class="card-title shadow-sm">Edit Address</h4>
+                </div>
+                <div class="card-body">
+                    <form action="/addresses/edit?_method=PUT" method="post" onsubmit="addAddress(event)">
+                        <input type="hidden" name="_method" value="PUT">
+                        <div class="container" style="width:90%">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <input type="hidden" name="user._id">
+                                <div class="checkout__input">
+                                    <p>Name<span>*</span></p>
+                                    <input type="text" onkeyup="validateUsername()" id="name" value="<%= editAddress.Name%>" name="name">
+                                    <span class="error text text-danger"  id="usernameError"></span>
                                 </div>
-        
-                                <div class="ms-auto">
-                                    <p class="card-text">Order Status: <%= product.status %></p>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="checkout__input">
+                                    <p>Mobile<span>*</span></p>
+                                    <input type="text" onkeyup="validatePhnumber()" id="mobile" value="<%= editAddress.Mobile%>" name="mobile">
+                                    <span class="error text text-danger"  id="mobileError"></span>
                                 </div>
                             </div>
                         </div>
-                    <% }) %>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="checkout__input">
+                                    <p>Pincode<span>*</span></p>
+                                    <input type="text" onkeyup="validatePin()" id="pincode" value="<%= editAddress.Pincode%>" name="pincode">
+                                    <span class="error text text-danger"  id="pinError"></span>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="checkout__input">
+                                    <p>Locality<span>*</span></p>
+                                    <input type="text" onkeyup="validateLocality()" id="locality" value="<%= editAddress.Locality%>" name="locality" >
+                                    <span class="error text text-danger"  id="localityError"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="checkout__input">
+                            <p>Address<span>*</span></p>
+                            <input type="text" placeholder="Street Address" value="<%= editAddress.Address%>" onkeyup="validateAddress()"
+                               id="address" name="address">
+                                <span class="error text text-danger"  id="addressError"></span>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="checkout__input">
+                                    <p>City/Town<span>*</span></p>
+                                    <input type="text" onkeyup="validateCity()" id="city" value="<%= editAddress.City%>" name="city">
+                                    <span class="error text text-danger"  id="cityError"></span>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="checkout__input">
+                                    <p>State<span>*</span></p>
+                                    <input type="text" onkeyup="validateState()" id="state" value="<%= editAddress.State%>" name="state">
+                                    <span class="error text text-danger"  id="stateError"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="checkout__input">
+                            <p>Country<span>*</span></p>
+                            <input type="text" id="country" name="country" onkeyup="validateCountry()"  value="<%= editAddress.Country%>">
+                            <span class="error text text-danger"  id="countryError"></span>
+                        </div>
+    
+                        <button type="submit" class="btn btn-dark">Save</button>
+                        <span class="text-danger" id="submitError"> </span>
+                    </div>
+                    </form>
                 </div>
-                <div class="w-100 d-flex flex-column justify-content-start p-3"><h3>Billed To:</h3>
-                <p><%= order.address.Name%></p>
-                <p><%= order.address.Mobile%></p>
-                <p><%= order.address.Pincode%></p>
-                <p><%= order.address.Locality%></p>
-                <p><%= order.address.Address%></p>
-                <p><%= order.address.City%></p>
-                <p><%= order.address.State%></p>
             </div>
-            <% }) %>
-        
         </div>
-        
-        
-        
     </div>
     
     <footer class="main">
@@ -266,6 +304,7 @@
             </div>
         </div>
     </div>
+    
     <!-- Vendor JS-->
     <script src="/public/user/js/vendor/modernizr-3.6.0.min.js"></script>
     <script src="/public/user/js/vendor/jquery-3.6.0.min.js"></script>

@@ -1,3 +1,4 @@
+const imageError = document.getElementById('imageError')
 function validateName(){
     var nameField = document.getElementById('name').value;
     if(nameField.length == 0){
@@ -45,7 +46,7 @@ function validatePrice(){
 function validateQuantity(){
     var quantityField = document.getElementById('quantity').value
     if(quantityField <= 0){
-        quantityError.innerHTML = 'Price must be greater than 0';
+        quantityError.innerHTML = 'Quantity must be greater than 0';
         return false;
     }
     quantityError.innerHTML='<i class="fa-solid fa-check"></i>';
@@ -74,10 +75,45 @@ function validateFlavour(){
     return true;
 }
 
+function previewImages(input) {
+    validateImage()
+    var previewContainer = document.getElementById("imagePreviewContainer");
+    previewContainer.innerHTML = ""; // Clear previous previews
+
+    var files = input.files;
+
+    for (var i = 0; i < files.length; i++) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            var imageContainer = document.createElement("div");
+            imageContainer.classList.add("image-preview");
+
+            var image = document.createElement("img");
+            image.src = e.target.result;
+            image.classList.add("preview-image");
+            imageContainer.appendChild(image);
+
+            var closeButton = document.createElement("button");
+            closeButton.innerHTML = "&times;";
+            closeButton.classList.add("close-button");
+            closeButton.onclick = function () {
+                // Remove the corresponding image preview on close button click
+                previewContainer.removeChild(imageContainer);
+            };
+
+            imageContainer.appendChild(closeButton);
+            previewContainer.appendChild(imageContainer);
+        };
+
+        reader.readAsDataURL(files[i]);
+
+    }
+}
+
 function validateImage(){
     var img = document.getElementById('imginput')
     let flag = true;
-    if(img.files){
+    if(img.files.length > 0){
         for(let image of img.files){
             if(!image.type.startsWith('image/')){
                 imageError.innerHTML = 'Insert a valid image'
@@ -85,11 +121,15 @@ function validateImage(){
                 break;
             }
             else{
+                console.log("jjgjgjg")
                 imageError.innerHTML = ''
-
                 flag = true;
             }
         }
+    }
+    else{
+        imageError.innerHTML = 'Insert a valid image'
+        flag = false;
     }
     console.log(flag)
     return flag;
@@ -130,14 +170,15 @@ function validateImage(){
 
 
 function validateForm(event){
-
     validateName()
     validateDescription()
     validatePrice() 
     validateQuantity()
     validateCategory()
     validateFlavour()
+
     validateImage()
+    
 
     if(!validateName() || !validateDescription() || !validatePrice() || !validateQuantity() || !validateCategory() || !validateFlavour() || !validateImage()){
         console.log('product validation')

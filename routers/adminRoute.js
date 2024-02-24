@@ -2,6 +2,7 @@ const express = require('express')
 const adminController = require('../controllers/adminController')
 const categories = require('../controllers/categoryController')
 const products = require('../controllers/productController')
+const orderController = require('../controllers/orderController')
 const router = express()
 const adminware = require('../middleware/adminware')
 const multer = require('multer')
@@ -50,6 +51,9 @@ router.get('/edit_Product', adminware.adminLogin, products.getEdit_product)
 router.put('/edit_product', upload.array('images'), products.postEdit_product)
 router.get('/editproduct/removeimage', adminware.adminLogin, products.removeImage)
 router.get('/status', adminware.adminLogin, products.productStatus)
+
+router.get('/orders',adminware.adminLogin,orderController.getOrderList)
+router.get('/orders/status',adminware.adminLogin,orderController.orderStatus)
 
 router.get('/productList', adminware.adminLogin, products.getListProducts)
 
