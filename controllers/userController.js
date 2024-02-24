@@ -130,7 +130,9 @@ const userController ={
 
     getAddAddress:async(req,res)=>{
         try{
-            res.render('user/userAddAddress')
+            const uid = req.session.user
+            const user = await User.findOne({_id:uid})
+            res.render('user/userAddAddress',{user})
         }
         catch(error){
             console.log(error)
@@ -162,30 +164,21 @@ const userController ={
     getAddress:async(req,res)=>{
         try{
             const uid = req.session.user;
+            const user = await User.findOne({_id:uid})
             const address = await Address.findOne({userID:uid})
             console.log(address.addresses[0].Name)
-            res.render('user/userAddress',{address})
+            res.render('user/userAddress',{address,user})
         }
         catch(error){
             console.log(error.message);
         }
     },
 
-    getOrders:async(req,res)=>{
+    changePassword:async(req,res)=>{
         try{
             const uid = req.session.user;
-            const orders = await Orders.findOne({userID:uid}).populate('orders.products.productID')
-            const reqorder = orders.orders.map(pr=>{
-                console.log(pr)
-            })
-            // orders.orders.forEach(pr=>{
-            //     pr.products.forEach(el=>{
-            //         console.log(el.productID.ProductName)
-            //     })
-                
-            // })
-            
-            res.render('user/userOrders',{orders})
+            const user = await User.findOne({_id:uid})
+            res.render('user/changePassword',{user,message:''})
         }
         catch(error){
             console.log(error.message)
@@ -198,6 +191,91 @@ const userController ={
             const uid = req.query.id;
             const product = await Products.findOne({_id:uid})
             res.render('user/productDetails',{product,user})
+        }
+        catch(error){
+            console.log(error.message)
+        }
+    },
+
+    putChangePassword:async(req,res)=>{
+        try{
+            const user = await User.findOne({_id:req.session.user})
+            const hashed = user.password
+            const password = req.body.currentPassword
+            const verified = await bcrypt.compare(password,hashed)
+            if(verified){
+                if(req.body.confirmNewPassword == re.body.newPassword){
+                    const updatedPassword = await bcrypt.hash(req.body.confirmNewPassword,saltround)
+                    const updatedUser = await User.findOneAndUpdate({_id:req.session.user},{$set:{password:updatedPassword}})
+                    res.redirect('/logout')
+                }
+                else{
+                    res.render('user/changePassword',{user,message:'New Password and Confirm NewPassword must match'})
+                }
+            }
+            else{
+                res.render('user/changePassword',{user,message:'Enter correct password'})
+            }
+
+        }
+        catch(error){
+            console.log(error.message)
+        }
+    },
+
+    getEditAddress:async(req,res)=>{
+        try{
+            const userID = req.session.user
+            const addressID = req.query.id
+            req.session.addressID = addressID
+            const user = await User.findOne({_id:userID})
+            const address = await Address.findOne({userID:userID})
+            let editAddress;
+            address.addresses.forEach(el=>{
+                if(el._id == addressID){
+                    editAddress = el;
+                }
+            })
+            console.log(editAddress)
+            res.render('user/userEditAddress',{editAddress,user})
+        }
+        catch(error){
+            console.log(error.message)
+        }
+    },
+    putEditAddress:async(req,res)=>{
+        try{
+            const{name,mobile,pincode,locality,address,city,state,country}=req.body
+            const uid = req.session.user;
+            const addressID = req.session.addressID;
+            const usradd = await Address.findOne({userID:uid})
+            usradd.addresses.forEach(el=>{
+                if(el._id == addressID){
+                    el.Name = name;
+                    el.Mobile = mobile;
+                    el.Pincode = pincode;
+                    el.Locality = locality;
+                    el.Address = address;
+                    el.City = city;
+                    el.State = state;
+                    el.Country = country;
+                }
+            })
+            await usradd.save();
+            res.redirect('/addresses')  
+        }
+        catch(error){
+            console.log(error.message)
+        }
+    },
+    getDelAddress:async(req,res)=>{
+        try{
+            const userID = req.session.user
+            const addressID = req.query.id
+            req.session.addressID = addressID
+            const user = await User.findOne({_id:userID})
+            const address = await Address.findOneAndUpdate({userID:userID},{$pull:{addresses:{_id:addressID}}})
+            res.redirect('/addresses')
         }
         catch(error){
             console.log(error.message)

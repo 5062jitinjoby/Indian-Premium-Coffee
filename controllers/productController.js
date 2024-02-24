@@ -11,7 +11,7 @@ const products = {
         try {
             const flavours = await Flavour.find()
             const categories = await Category.find()
-            res.render('admin/addProduct', { flavours, categories })
+            res.render('admin/addProduct', { flavours, categories})
         }
         catch (error) {
             console.log(error.message)

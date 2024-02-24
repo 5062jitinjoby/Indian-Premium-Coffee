@@ -8,10 +8,11 @@ const cart = {
     getCart:async(req,res)=>{
         try{
             const usid = req.session.user;
+            const user = await User.findOne({_id:usid})
             const products= await Products.find({})
             const cart = await Cart.findOne({userID:usid}).populate('products.productID')
             
-            res.render('user/cart',{cart})
+            res.render('user/cart',{cart,user})
         }
         catch(error){
             console.log(error.message)
@@ -29,19 +30,22 @@ const cart = {
             if(cart){
                 const productToUpdate = cart.products.filter(product=>product.productID==prid)
                 // console.log(productToUpdate)
-                if(productToUpdate.length>0){
-                    // console.log('existing product')
-                    const quantity = 1;
-                    const updateCart = await Cart.findOneAndUpdate({userID:usid,'products.productID':prid},
-                                                            {$inc:{'products.$.quantity':quantity,'products.$.cost':cost}},
-                                                            {new:true})
-                }
-                else{
+                // if(productToUpdate.length>0){
+                //     // console.log('existing product')
+                //     const quantity = 1;
+                //     const updateCart = await Cart.findOneAndUpdate({userID:usid,'products.productID':prid},
+                //                                             {$inc:{'products.$.quantity':quantity,'products.$.cost':cost}},
+                //                                             {new:true})
+                // }
+                // else{
                     // console.log('new product')
-                    const product = {productID:prid,quantity:1}
-                    const updateCart2 = await Cart.findOneAndUpdate({userID:usid},
-                                            {$push:{products:{productID:prid,quantity:1,cost:cost}}},{new:true})  
-                }
+                    if(productToUpdate.length == 0){
+                        const product = {productID:prid,quantity:1}
+                        const updateCart2 = await Cart.findOneAndUpdate({userID:usid},
+                                            {$push:{products:{productID:prid,quantity:1,cost:cost}}},{new:true}) 
+                    }
+                     
+                // }
 
             }
             else{
@@ -68,10 +72,20 @@ const cart = {
             const usid = req.session.user;
             const product = await Products.findOne({_id:prid})
             const cost = product.price;
+            const cart = await Cart.findOne({userID:usid})
             const quantity = 1;
-            const updateCart = await Cart.findOneAndUpdate({userID:usid,'products.productID':prid},
+            const cartPrdct = cart.products.filter(el=>el.productID==prid)
+            let cartQty;
+            cartPrdct.forEach(el=>{ cartQty = el.quantity})
+            console.log(cartQty)
+            if(cartQty<product.quantity){
+                const updateCart = await Cart.findOneAndUpdate({userID:usid,'products.productID':prid},
                                                     {$inc:{'products.$.quantity':quantity,'products.$.cost':cost}},
                                                     {new:true})
+                const billTotal = updateCart.billTotal;
+                updateCart.billTotal=billTotal+cost;
+                await updateCart.save();
+            }
             res.json({success:true})
         }
         catch(error){
@@ -86,14 +100,24 @@ const cart = {
             const usid = req.session.user;
             const product = await Products.findOne({_id:prid})
             const cost = product.price;
+            const cart = await Cart.findOne({userID:usid})
             const quantity = 1;
-            const updateCart = await Cart.findOneAndUpdate({userID:usid,'products.productID':prid},
+            const cartPrdct = cart.products.filter(el=>el.productID==prid)
+            let cartQty;
+            cartPrdct.forEach(el=>{ cartQty = el.quantity})
+            console.log(cartQty)
+            if(cartQty>1){
+                const updateCart = await Cart.findOneAndUpdate({userID:usid,'products.productID':prid},
                                                     {$inc:{'products.$.quantity':-quantity,'products.$.cost':-cost}},
                                                     {new:true})
+                const billTotal = updateCart.billTotal;
+                updateCart.billTotal=billTotal-cost;
+                await updateCart.save();
+            }
             res.json({success:true})
         }
         catch(error){
-            console.log(error)
+            console.log(error.message)
         }
     },
     
@@ -102,45 +126,32 @@ const cart = {
     getCheckout:async(req,res)=>{
         try{
             const usid = req.session.user;
+            const user = await User.findOne({_id:usid})
             const products= await Products.find({})
             const cart = await Cart.findOne({userID:usid}).populate('products.productID')
             const address = await Address.findOne({userID:usid})
             console.log(cart)
-            res.render('user/checkout',{cart,address})
+            res.render('user/checkout',{cart,address,user})
         }
         catch(error){
             console.log(error.message)
         }
     },
-    ordered:async(req,res)=>{
-        try{
-            const usid = req.session.user;
-            const cart = await Cart.findOne({userID:usid})
-            const order = await Orders.findOne({userID:usid})
-            const currentDate = new Date();
-            if(order){
-                const updatedOrder = await Orders.findOneAndUpdate({userID:usid},
-                    {$push:{orders:[{products:cart.products,date:currentDate,status:'placed'}]}},{new:true}) 
-            }
-            else{
-                // const updatedOrder = await Orders.create({userID:usid,
-                //     orders:[{products:cart.products}]},{new:true})
-                console.log(cart.products)
-                const orderr = new Orders ({
-                    userID:usid,
-                    products:cart.products,
-                    date:currentDate,
-                })
-                const savedOrder = await orderr.save()
-                console.log(savedOrder);
-            }
 
-            res.render('user/order')
+    deleteItem:async(req,res)=>{
+        try{
+            const id = req.query.id
+            console.log(id)
+            const usid = req.session.user;
+            const itemtoDelete = await Cart.findOneAndUpdate({userID:usid},{$pull:{products:{productID:id}}},{new:true})
+            console.log(itemtoDelete);
+            res.redirect('/cart')
         }
         catch(error){
-            console.log(error)
+            console.log(error.message)
         }
-    }
+    },
+    
 }
 
 module.exports = cart;

@@ -91,7 +91,8 @@
                                                 <span class="error text text-danger"  id="emailError"></span>
                                             </div>
                                             <div class="form-group">
-                                                <input  type="password" name="password" id="password" placeholder="Password">
+                                                <input  type="password" name="password" id="password" onkeyup="validatePassword()" placeholder="Password">
+                                                <span class="error text text-danger"  id="passwordError"></span>
                                             </div>
                                             <div class="form-group">
                                                 <input type="tel" name="phoneNumber" id="phoneNumber" onkeyup="validatePhnumber()" placeholder="Phone Number">

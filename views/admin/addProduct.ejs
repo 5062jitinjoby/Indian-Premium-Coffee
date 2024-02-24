@@ -53,6 +53,11 @@
                     </div>
                 </li>
                 <li class="menu-item">
+                    <a class="menu-link" href="/admin/orders"> <i class="icon material-icons md-shopping_cart"></i>
+                        <span class="text">Orders</span>
+                    </a>
+                </li>
+                <li class="menu-item">
                     <a class="menu-link" href="/admin/addProduct"> <i class="icon material-icons md-add_box"></i>
                         <span class="text">Add product</span>
                     </a>
@@ -228,7 +233,8 @@
                                     <div class="col-md-9">
                                         <div class="mb-4">
                                             <label class="form-label">Images</label>
-                                            <input class="form-control" type="file" onchange="previewImages(input)" name="images" multiple>
+                                            <input class="form-control" type="file" id="imginput" onchange="previewImages(this)" name="images" multiple>
+                                            <p id="imageError"></p>
                                             <div id="imagePreviewContainer" class="mt-2"></div>
                                         </div>
                                     </div> <!-- col.// -->
@@ -260,28 +266,6 @@
         </footer>
     </main>
 
-    <script>
-        function previewImages(input) {
-            var imagePreviewContainer = document.getElementById('imagePreviewContainer');
-            imagePreviewContainer.innerHTML = ''; // Clear previous previews
-        
-            if (input.files) {
-                for (var i = 0; i < input.files.length; i++) {
-                    var reader = new FileReader();
-        
-                    reader.onload = function (e) {
-                        var imgElement = document.createElement('img');
-                        imgElement.src = e.target.result;
-                        imgElement.style.maxWidth = '100px'; // Set the maximum width for the preview image
-                        imgElement.style.marginRight = '5px'; // Add some margin between images
-                        imagePreviewContainer.appendChild(imgElement);
-                    };
-        
-                    reader.readAsDataURL(input.files[i]);
-                }
-            }
-        }
-    </script>
 
 
     <script src="/public/js/productValidation.js"></script>
