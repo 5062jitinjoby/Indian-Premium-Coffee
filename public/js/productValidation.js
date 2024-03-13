@@ -121,7 +121,6 @@ function validateImage(){
                 break;
             }
             else{
-                console.log("jjgjgjg")
                 imageError.innerHTML = ''
                 flag = true;
             }

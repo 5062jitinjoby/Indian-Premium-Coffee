@@ -22,7 +22,7 @@
 <body>
     <%-include('userheader.ejs')%>    
     <main class="main">
-        <div class="page-header breadcrumb-wrap">
+        <!-- <div class="page-header breadcrumb-wrap">
             <div class="container">
                 <div class="breadcrumb">
                     <a href="index.html" rel="nofollow">Home</a>
@@ -30,7 +30,7 @@
                     <span></span> Your Cart
                 </div>
             </div>
-        </div>
+        </div> -->
         <section class="mt-50 mb-50">
             <div class="container">
                 <div class="row">
@@ -55,9 +55,13 @@
                                                     <td class="image product-thumbnail"><img src="/uploads/<%=item.productID.image[0]%>" alt="#"></td>
                                                     <td class="product-des product-name">
                                                         <h5 class="product-name"><a href=""><%= item.productID.ProductName%></a></h5>
-                                                    
                                                     </td>
-                                                    <td class="price" data-title="Price"><span class="pprice<%= item.productID._id%>"><%= item.productID.price%></span></td>
+                                                    <%if(item.productID.offerPrice!=0){%>
+                                                        <td class="price" data-title="Price"><span class="pprice<%= item.productID._id%>"><%= item.productID.offerPrice%></span></td>
+                                                    <%}
+                                                    else{%>
+                                                        <td class="price" data-title="Price"><span class="pprice<%= item.productID._id%>"><%= item.productID.price%></span></td>
+                                                    <%}%>
                                                     <td class="text-center" data-title="Stock">
                                                         <div class="detail-qty border radius  m-auto">
                                                             <button class="qtyup" data-proid='<%= item.productID._id%>' data-stock="<%=item.productID.quantity%>"><i class="fi-rs-angle-small-up"></i></button>
@@ -72,7 +76,7 @@
                                                     <td class="action" data-title="Remove"><a href="/cart/deleteItem?id=<%= item.productID._id%>" class="text-muted"><i class="fi-rs-trash"></i></a></td>
                                                 </tr>
                                             <%})%>
-                                            <% } else { %>
+                                        <% } else { %>
                                                 <tr>
                                                     <td colspan="6" class="text-center">Your cart is empty.</td>
                                                 </tr>
@@ -96,78 +100,112 @@
                             <a class="btn  mr-10 mb-sm-15"><i class="fi-rs-shuffle mr-10"></i>Update Cart</a>
                             <a class="btn "><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a>
                         </div> -->
-                        <div class="divider center_icon mt-50 mb-50"><i class="fi-rs-fingerprint"></i></div>
+                        <div class="divider center_icon mt-50 mb-50"></div>
                         <div class="row mb-50">
+                            <!-- Coupons Section -->
                             <div class="col-lg-6 col-md-12">
                                 <div class="heading_s1 mb-3">
-                                    <h4>Calculate Shipping</h4>
+                                    <h4>Coupons</h4>
                                 </div>
-                                <p class="mt-15 mb-30">Flat rate: <span class="font-xl text-brand fw-900">5%</span></p>
-                                <form class="field_form shipping_calculator">
-                                    <div class="form-row row">
-                                        <div class="form-group col-lg-6">
-                                            <input required="required" placeholder="State / Country" name="name" type="text">
-                                        </div>
-                                        <div class="form-group col-lg-6">
-                                            <input required="required" placeholder="PostCode / ZIP" name="name" type="text">
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="form-group col-lg-12">
-                                            <button class="btn  btn-sm"><i class="fi-rs-shuffle mr-10"></i>Update</button>
-                                        </div>
-                                    </div>
-                                </form>
-                                <div class="mb-30 mt-50">
-                                    <div class="heading_s1 mb-3">
-                                        <h4>Apply Coupon</h4>
-                                    </div>
-                                    <div class="total-amount">
-                                        <div class="left">
-                                            <div class="coupon">
-                                                <form action="#" target="_blank">
-                                                    <div class="form-row row justify-content-center">
-                                                        <div class="form-group col-lg-6">
-                                                            <input class="font-medium" name="Coupon" placeholder="Enter Your Coupon">
+                                <!-- Coupon Listing -->
+                                <!-- Inside the body or a card container -->
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="coupon-list mb-30" style="max-height: 200px; overflow-y: auto;">
+                                            <% if (coupons) { %>
+                                                <% coupons.forEach(coupon => { %>
+                                                    <!-- Inside the Coupon Listing section -->
+                                                    <div class="coupon-item">
+                                                        <div class="coupon-code-container">
+                                                            <span class="coupon-code"><%= coupon.couponCode %></span>
+                                                            <p class="coupon-details">Min Purchase : Rs.<%= coupon.minAmount%> Discount: Rs.<%= coupon.discountPrice%></p>
+                                                            <button class="btn btn-sm copy-coupon" onclick="copyCoupon('<%= coupon.couponCode %>')">Copy</button>
                                                         </div>
-                                                        <div class="form-group col-lg-6">
-                                                            <button class="btn  btn-sm"><i class="fi-rs-label mr-10"></i>Apply</button>
-                                                        </div>
+                                                        
                                                     </div>
-                                                </form>
+                                                    <!-- Add more coupons as needed -->
+                                                <% }) %>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Apply Coupon Form -->
+                                <% if(cart) { %>
+                                    <%if(cart.products.length>0){%>
+                                        <div class="mb-30 mt-50">
+                                            <div class="heading_s1 mb-3">
+                                                <h4>Apply Coupon</h4>
+                                            </div>
+                                            <div class="total-amount">
+                                                <div class="left">
+                                                    <div class="coupon">
+                                                            <div class="form-row row justify-content-center">
+                                                                <div class="form-group col-lg-6">
+                                                                    <input class="font-medium" name="Coupon" id="coupon" placeholder="Enter Your Coupon">
+                                                                </div>
+                                                                <div class="form-group col-lg-6">
+                                                                    <button class="btn btn-sm" onclick="couponApply()"><i class="fi-rs-label mr-10"></i>Apply</button>
+                                                                </div>
+                                                            </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
+                                    <%}%>
+                                <%}%>
                             </div>
-                            <%if(cart){%>
-                                <div class="col-lg-6 col-md-12">
-                                    <div class="border p-md-4 p-30 border-radius cart-totals">
-                                        <div class="heading_s1 mb-3">
-                                            <h4>Cart Totals</h4>
+                        
+                            <% if(cart) { %>
+                                <%if(cart.products.length>0){%>
+                                    <!-- Cart Totals Section -->
+                                    <div class="col-lg-6 col-md-12">
+                                        <div class="border p-md-4 p-30 border-radius cart-totals">
+                                            <div class="heading_s1 mb-3">
+                                                <h4>Cart Totals</h4>
+                                            </div>
+                                            <div class="table-responsive">
+                                                <table class="table">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td class="cart_total_label">Cart Subtotal</td>
+                                                            <td class="cart_total_amount"><span class="font-lg fw-900 text-brand" id="subtotal">Rs.<%= cart.subTotal %></span></td>
+                                                        </tr>
+                                                        <!-- Coupon Applied Section -->
+                                                        <% if(cart.coupon){ %>
+                                                            <tr id="coupon-applied-row">
+                                                                <td class="cart_total_label">Coupon Applied</td>
+                                                                <td class="cart_total_amount">
+                                                                    <span class="font-lg fw-900 text-brand" id="applied-coupon">-Rs.<%= cart.coupon.discountPrice %></span>
+                                                                    <!-- Add Remove Button -->
+                                                                    <button class="btn btn-sm btn-danger" onclick="removeCoupon()">Remove</button>
+                                                                </td>
+                                                            </tr>
+                                                        <% }
+                                                        else { %>
+                                                            <tr id="coupon-applied-row">
+                                                                <td class="cart_total_label">Coupon Applied</td>
+                                                                <td class="cart_total_amount">
+                                                                    <span class="font-lg fw-900 text-brand" id="applied-coupon">-</span>
+                                                                </td>
+                                                            </tr>
+                                                        <% } %>
+                                                        <tr>
+                                                            <td class="cart_total_label">Shipping</td>
+                                                            <td class="cart_total_amount"><i class="ti-gift mr-5"></i> Free Shipping</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="cart_total_label">Total</td>
+                                                            <td class="cart_total_amount"><strong><span class="font-xl fw-900 text-brand" id="total">Rs.<%= cart.billTotal %></span></strong></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div> 
+                                            <a href="/checkout" class="btn "><i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut</a>
                                         </div>
-                                        <div class="table-responsive">
-                                            <table class="table">
-                                                <tbody>
-                                                    <tr>
-                                                        <td class="cart_total_label">Cart Subtotal</td>
-                                                        <td class="cart_total_amount"><span class="font-lg fw-900 text-brand " id="subtotal">Rs.<%= cart.billTotal%></span></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="cart_total_label">Shipping</td>
-                                                        <td class="cart_total_amount"> <i class="ti-gift mr-5"></i> Free Shipping</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="cart_total_label">Total</td>
-                                                        <td class="cart_total_amount"><strong><span class="font-xl fw-900 text-brand " id="total">Rs.<%= cart.billTotal%></span></strong></td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        <a href="/checkout" class="btn "> <i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut</a>
                                     </div>
-                                </div> 
-                            <%}%>
+                                <% } %> 
+                            <% } %>
                         </div>
                     </div>
                 </div>
@@ -285,21 +323,6 @@
             </div>
         </div>
     </footer>
-    <!-- Preloader Start -->
-    <div id="preloader-active">
-        <div class="preloader d-flex align-items-center justify-content-center">
-            <div class="preloader-inner position-relative">
-                <div class="text-center">
-                    <h5 class="mb-5">Now Loading</h5>
-                    <div class="loader">
-                        <div class="bar bar1"></div>
-                        <div class="bar bar2"></div>
-                        <div class="bar bar3"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <script>
         const qtyup = document.querySelectorAll('.qtyup')
@@ -316,7 +339,7 @@
                 const stock = el.dataset.stock
                 console.log(stock,"ff"+currentqty)
                 if(currentqty + 1 <= stock){
-                let funcdata = await inc(pid)
+                let funcdata = await increment(pid)
                if(funcdata){
                 const currentcont = el.closest('.detail-qty') 
                 const currentval = parseInt(currentcont.querySelector('.qtyval').innerHTML)
@@ -344,7 +367,7 @@
                 const currentqty = parseInt(currentcon.querySelector('.qtyval').innerHTML)
                 const pid = el.dataset.proid
                if(currentqty - 1 >= 1){
-                let funcdata = await dec(pid)
+                let funcdata = await decrement(pid)
                if(funcdata){
                 const currentcont = el.closest('.detail-qty') 
                 const currentval = parseInt(currentcont.querySelector('.qtyval').innerHTML)
@@ -365,9 +388,9 @@
             })
         })
         
-        function inc(id){
+        function increment(id){
             console.log('increment')
-           return fetch(`/inc?id=${id}`,{
+           return fetch(`/increment?id=${id}`,{
                 method:'POST',
                 headers:{
                     'Content-Type':'application/json',
@@ -388,9 +411,9 @@
             })
         }
 
-        function dec(id){
-            console.log('increment')
-           return fetch(`/dec?id=${id}`,{
+        function decrement(id){
+            console.log('decrement')
+           return fetch(`/decrement?id=${id}`,{
                 method:'POST',
                 headers:{
                     'Content-Type':'application/json',
@@ -409,6 +432,65 @@
             .catch(error=>{
                 console.log(error)
             })
+        }
+        function couponApply(){
+            
+            const couponApplied = document.getElementById('coupon').value
+            console.log(couponApplied)
+            return fetch(`/couponApply?coupon=${couponApplied}`,{
+                method:'POST',
+                headers:{
+                    'Content-Type':'application/json',
+                },
+            })
+            .then(response => {
+                window.location.reload();
+                console.log(response);
+            })
+            .catch(error => {
+                // Handle errors
+                console.error('Error:', error);
+            });
+        }
+
+        function copyCoupon(couponCode) {
+            // Create a temporary input element
+            var tempInput = document.createElement('input');
+
+            // Set the input value to the coupon code
+            tempInput.value = couponCode;
+
+            // Append the input element to the document
+            document.body.appendChild(tempInput);
+
+            // Select the input value
+            tempInput.select();
+            tempInput.setSelectionRange(0, 99999); // For mobile devices
+
+            // Copy the selected text to the clipboard
+            document.execCommand('copy');
+
+            // Remove the temporary input element
+            document.body.removeChild(tempInput);
+            alert('Coupon code ' + couponCode + ' copied to clipboard!');
+        }
+        function removeCoupon(){
+            let remove_Coupon = document.getElementById('applied-coupon').textContent
+            return fetch(`/couponRemove`,{
+                method:'POST',
+                headers:{
+                    'Content-Type':'application/json',
+                },
+            })
+            .then(response => {
+                // Handle the response if needed
+                window.location.reload();
+                console.log(response);
+            })
+            .catch(error => {
+                // Handle errors
+                console.error('Error:', error);
+            });
         }
     </script>
     <!-- Vendor JS-->

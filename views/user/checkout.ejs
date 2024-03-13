@@ -133,12 +133,12 @@
                     </div>
                     <div class="col-lg-6">
                         <div class="toggle_info">
-                            <span><i class="fi-rs-label mr-10"></i><span class="text-muted">Have a coupon?</span> <a href="#coupon" data-bs-toggle="collapse" class="collapsed" aria-expanded="false">Click here to enter your code</a></span>
+                            <span><i class="fi-rs-label mr-10"></i><span class="text-muted">Have a coupon?</span> <a href="" data-bs-toggle="collapse" class="collapsed" aria-expanded="false">Click here to enter your code</a></span>
                         </div>
                         <div class="panel-collapse collapse coupon_form " id="coupon">
                             <div class="panel-body">
                                 <p class="mb-30 font-sm">If you have a coupon code, please apply it below.</p>
-                                <form method="post">
+                                <form method="post" >
                                     <div class="form-group">
                                         <input type="text" placeholder="Enter Coupon Code...">
                                     </div>
@@ -215,7 +215,7 @@
                                         </tr>
                                         <tr>
                                             <th>Total</th>
-                                            <td colspan="2" class="product-subtotal"><span class="font-xl text-brand fw-900">Rs.<%= cart.billTotal%></span></td>
+                                            <td colspan="2" class="product-subtotal"><span class="font-xl text-brand fw-900" id="total"><%= cart.billTotal%></span></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -227,20 +227,20 @@
                                 </div>
                                 <div class="payment_option">
                                     <div class="custome-radio">
-                                        <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios3" checked="">
+                                        <input class="form-check-input  paymentMethod " required="" type="radio" name="payment_option" value="cod"  id="exampleRadios3" checked="">
                                         <label class="form-check-label" for="exampleRadios3" data-bs-toggle="collapse" data-target="#bankTranfer" aria-controls="bankTranfer">COD</label>
                                         <div class="form-group collapse in" id="bankTranfer">
                                             <p class="text-muted mt-5">There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration. </p>
                                         </div>
                                     </div>
-                                    <!-- <div class="custome-radio">
-                                        <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios4" checked="">
-                                        <label class="form-check-label" for="exampleRadios4" data-bs-toggle="collapse" data-target="#checkPayment" aria-controls="checkPayment">UPI Payment</label>
+                                    <div class="custome-radio">
+                                        <input class="form-check-input  paymentMethod" required="" type="radio" name="payment_option" value="Razorpay"  id="exampleRadios4" checked="">
+                                        <label class="form-check-label" for="exampleRadios4" data-bs-toggle="collapse" data-target="#checkPayment" aria-controls="checkPayment">Razorpay</label>
                                         <div class="form-group collapse in" id="checkPayment">
                                             <p class="text-muted mt-5">Please send your cheque to Store Name, Store Street, Store Town, Store State / County, Store Postcode. </p>
                                         </div>
                                     </div>
-                                    <div class="custome-radio">
+                                    <!-- <div class="custome-radio">
                                         <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios5" checked="">
                                         <label class="form-check-label" for="exampleRadios5" data-bs-toggle="collapse" data-target="#paypal" aria-controls="paypal">Paypal</label>
                                         <div class="form-group collapse in" id="paypal">
@@ -249,7 +249,7 @@
                                     </div> -->
                                 </div>
                             </div>
-                            <a href="/ordered" class="btn btn-fill-out btn-block mt-30" id="placeOrder" onclick="validateCheckout(event)">Place Order</a>
+                            <a  class="btn btn-fill-out btn-block mt-30" id="placeOrder" onclick="validateCheckout(event)">Place Order</a>
                         </div>
                     </div>
                 </div>
@@ -382,18 +382,119 @@
             </div>
         </div>
     </div>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
-        function validateCheckout(event){
             const billAddress = document.querySelectorAll('.billAddress')
+            const paymentMethod = document.querySelectorAll('.paymentMethod')
+            const total_Amount = document.getElementById('total').textContent
+            const total_Price = parseInt(total_Amount)
+            let payment_Gateway;
+            let addressId;
+        function validateCheckout(event){
+            console.log(paymentMethod)
+            const payment=Array.from(paymentMethod)
+            console.log(payment);
+            let paymentStatus = false;
+            let addressStatus = false;
+            payment.forEach(el=>{
+               if(el.checked){
+                    paymentStatus = true;
+                    payment_Gateway = el.value;
+               }
+               else{
+                 event.preventDefault()
+               }     
+            })
             billAddress.forEach(el=>{
                 if(el.checked){
-                    console.log(el.value)
-                    window.location.href = `/ordered?aid=${el.value}`
+                    addressStatus = true;
+                    addressId = el.value
+                    sendOrderData(addressId, payment_Gateway, total_Amount);
                 }else{
                     event.preventDefault()
                 }
             })
+                       
+        }
+        function sendOrderData(addressId, paymentGateway, totalAmount) {
+            console.log('placeorder');
+            console.log(addressId, paymentGateway, totalAmount)    
+            fetch('/createOrder', {
+                method:'POST', 
+                headers: {
+                    'Content-Type': 'application/json',   
+                },
+                body:JSON.stringify({addressId,paymentGateway,totalAmount})
+            })
+            .then(respone => respone.json())
+            .then(data=>{
+                if (data.paymentMethod == 'Razorpay') {
+                    console.log('pay')
+                    razorpay(data.order);
+                }
+                else if(data.paymentMethod == 'COD'){
+                    window.location.href = `/orderPlaced?aid=${addressId}&payment=${data.paymentMethod}`
+                }
+                else{
+                    console.error("Unsupported Payment")
+                }
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+                // Handle errors appropriately
+            });
+        }
+        function razorpay(order){
+            console.log('orderpay')
+            var options = {
+                "key": "rzp_test_Q5p8yCd0Ar1jaI", // Enter the Key ID generated from the Dashboard
+                "amount": total_Price*100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                "currency": "INR",
+                "name": "Indian Premium Coffee", //your business name
+                "description": "Test Transaction",
+                "image": "https://example.com/your_logo",
+                "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                "handler": function (response){
+                    alert(response.razorpay_payment_id);
+                    alert(response.razorpay_order_id);
+                    alert(response.razorpay_signature)
+                    verifyPayment(response,order)
+                },
+                "prefill": { //We recommend using the prefill parameter to auto-fill customer's contact information, especially their phone number
+                    "name": "Gaurav Kumar", //your customer's name
+                    "email": "gaurav.kumar@example.com", 
+                    "contact": "9000090000"  //Provide the customer's phone number for better conversion rates 
+                },
+                "notes": {
+                    "address": "Razorpay Corporate Office"
+                },
+                "theme": {
+                    "color": "#3399cc"
+                }
+            };
+            var rzp1 = new Razorpay(options);
+            rzp1.open();
+        }
+        function verifyPayment(payment,order){
+            console.log('verify')
+            $.ajax({
+                url:'/verify-payment',
+                data:{
+                    payment,
+                    order
+                },
+                method:'POST',
+                success: function(respone){
+                    payment_Status(respone);
+                }
+            })
             
+        }
+        function payment_Status(respone){
+            if(respone.status == true){
+                console.log('place razorpay')
+                window.location.href = `/orderPlaced?aid=${addressId}&payment=${payment_Gateway}`
+            }
         }
 
     </script>

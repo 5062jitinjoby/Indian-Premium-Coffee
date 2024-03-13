@@ -1,5 +1,7 @@
+const mongoose = require('mongoose');
 const User = require('../models/user')
 const Products = require('../models/products')
+const Category = require('../models/category')
 const Address = require('../models/address')
 const Orders = require('../models/orders')
 const getotp = require('../otp')
@@ -9,7 +11,7 @@ const saltround=10;
 const userController ={
     //login
     getL:(req,res)=>{
-        res.redirect('/login')
+        res.redirect('/home')
     },
     getLogin:(req,res)=>{
         res.render('user/login',{message:''})
@@ -108,20 +110,60 @@ const userController ={
 
     getHome:async(req,res)=>{
         try{
-            const user = await User.findOne({_id:req.session.user}) 
-            const products = await Products.find().populate('category')
-            res.render('user/home',{products,user})
+            const currentPage = req.query.page || 1;
+            const pageLimit = 8;
+            const productCount = await Products.find({isActive:true}).count()
+            const startIndex = (currentPage - 1) * pageLimit;
+            const endIndex = currentPage * pageLimit;
+            const products = await Products.find({ isActive: true })
+                .populate('category')
+                .skip(startIndex)
+                .limit(pageLimit);
+            const category = await Category.find();
+            const totalPages = Math.ceil(productCount / pageLimit);
+            if(req.session.user){
+                const user = await User.findOne({_id:req.session.user})
+                res.render('user/home',{products,user,
+                    category,
+                    currentPage,
+                    totalPages,startIndex,endIndex})
+            }
+            else{
+                res.render('user/home',{products,
+                    category,
+                    currentPage,
+                    totalPages,startIndex,endIndex})
+            }
+            
         }
         catch(error){
             console.log(error.message)
         }
     },
+    categoryFilter:async(req,res)=>{
+        try{
+            const categorId = req.query.selectedCategory
+            const products = await Products.find().populate('category')
+            const user = await User.findOne({_id:req.session.user})
+            const category = await Category.find() 
+            const categorProduct = products.filter(product=>product.category._id==categorId)
 
+            res.render('user/categoryFilter',{categorProduct,category,user})
+            console.log(categorProduct);
+        }
+        catch(error){
+            console.log(error.message);
+        }
+    },
+
+
+    //profile
     getProfile:async(req,res)=>{
         try{
             const uid = req.session.user
             const user = await User.findOne({_id:uid})
-            res.render('user/userProfile',{user})
+            const category = await Category.find() 
+            res.render('user/userProfile',{user,category})
         }
         catch(error){
             console.log(error.message);
@@ -132,7 +174,8 @@ const userController ={
         try{
             const uid = req.session.user
             const user = await User.findOne({_id:uid})
-            res.render('user/userAddAddress',{user})
+            const category = await Category.find() 
+            res.render('user/userAddAddress',{user,category})
         }
         catch(error){
             console.log(error)
@@ -166,8 +209,9 @@ const userController ={
             const uid = req.session.user;
             const user = await User.findOne({_id:uid})
             const address = await Address.findOne({userID:uid})
+            const category = await Category.find() 
             console.log(address.addresses[0].Name)
-            res.render('user/userAddress',{address,user})
+            res.render('user/userAddress',{address,user,category})
         }
         catch(error){
             console.log(error.message);
@@ -178,7 +222,8 @@ const userController ={
         try{
             const uid = req.session.user;
             const user = await User.findOne({_id:uid})
-            res.render('user/changePassword',{user,message:''})
+            const category = await Category.find() 
+            res.render('user/changePassword',{category,user,message:''})
         }
         catch(error){
             console.log(error.message)
@@ -187,10 +232,15 @@ const userController ={
 
     productDetails:async(req,res)=>{
         try{
+            const productID = req.query.id;
+            if (!mongoose.Types.ObjectId.isValid(productID)) {
+                res.status(404).render('404');
+                return;
+            }
             const user = await User.findOne({_id:req.session.user}) 
-            const uid = req.query.id;
-            const product = await Products.findOne({_id:uid})
-            res.render('user/productDetails',{product,user})
+            const product = await Products.findOne({_id:productID})
+            const category = await Category.find() 
+            res.render('user/productDetails',{product,user,category})
         }
         catch(error){
             console.log(error.message)
@@ -203,6 +253,7 @@ const userController ={
             const hashed = user.password
             const password = req.body.currentPassword
             const verified = await bcrypt.compare(password,hashed)
+            const category = await Category.find() 
             if(verified){
                 if(req.body.confirmNewPassword == re.body.newPassword){
                     const updatedPassword = await bcrypt.hash(req.body.confirmNewPassword,saltround)
@@ -210,11 +261,11 @@ const userController ={
                     res.redirect('/logout')
                 }
                 else{
-                    res.render('user/changePassword',{user,message:'New Password and Confirm NewPassword must match'})
+                    res.render('user/changePassword',{user,category,message:'New Password and Confirm NewPassword must match'})
                 }
             }
             else{
-                res.render('user/changePassword',{user,message:'Enter correct password'})
+                res.render('user/changePassword',{user,category,message:'Enter correct password'})
             }
 
         }
@@ -230,6 +281,7 @@ const userController ={
             req.session.addressID = addressID
             const user = await User.findOne({_id:userID})
             const address = await Address.findOne({userID:userID})
+            const category = await Category.find() 
             let editAddress;
             address.addresses.forEach(el=>{
                 if(el._id == addressID){
@@ -237,7 +289,7 @@ const userController ={
                 }
             })
             console.log(editAddress)
-            res.render('user/userEditAddress',{editAddress,user})
+            res.render('user/userEditAddress',{editAddress,category,user})
         }
         catch(error){
             console.log(error.message)
