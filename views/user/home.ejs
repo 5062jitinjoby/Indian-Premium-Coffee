@@ -159,48 +159,47 @@
                 <!--End nav-tabs-->
                 <div class="tab-content wow fadeIn animated" id="myTabContent">
                     <div class="tab-pane fade show active" id="tab-one" role="tabpanel" aria-labelledby="tab-one">
-                        <div class="row product-grid-4">
-                            <%if(products){%>
-                                <%products.forEach(product=>{%>
-                                    <%if(product.isActive == true && product.category.isActive == true){%>
-                            <div class="col-lg-3 col-md-4 col-12 col-sm-6">
-                               
-                                            <div class="product-cart-wrap mb-30">
-                                                <div class="product-img-action-wrap">
-                                                    <div class="product-img product-img-zoom">
-                                                        <a href="/productDetails/?id=<%= product._id%>">
-                                                            <img class="default-img" src="/uploads/<%=product.image[0]%>" alt="">
-                                                        </a>
-                                                    </div>  
-                                                    <div class="product-badges product-badges-position product-badges-mrg">
-                                                        <span class="hot">Hot</span>
-                                                    </div>
-                                                </div>
-                                                <div class="product-content-wrap">
-                                                    <!-- <div class="product-category">
-                                                        <a href="#"></a>
-                                                    </div> -->
-                                                    <h2><a href="#"><%=product.ProductName%></a></h2>
-                                                    <!-- <div class="rating-result" title="90%">
-                                                        <span>
-                                                            <span>90%</span>
-                                                        </span>
-                                                    </div> -->
-                                                    <div class="product-price">
-                                                        <span>Rs.<%=product.price%> </span>
-                                                        <!-- <span class="old-price">$245.8</span> -->
-                                                    </div>
-                                                    <div class="product-action-1 show">
-                                                      <button aria-label="Add To Cart" id="cart" class="action-btn hover-up" onclick="addToCart('<%= product._id%>')" > <i class="fi-rs-shopping-bag-add"></i></button> 
-                                                    </div>
+                        <div class="pagination">
+                            <button onclick="prevPage('<%=currentPage%>','<%=totalPages%>')">Previous</button>
+                            <button onclick="nextPage('<%=currentPage%>','<%=totalPages%>')">Next</button>
+                        </div>
+                        
+                        <!-- Product Grid -->
+                        <div class="row product-grid-4" id="productGrid">
+                            <% if(locals.products) { %>
+                                <% products.forEach(product => { %>
+                                    <div class="col-lg-3 col-md-4 col-12 col-sm-6">
+                                        <div class="product-cart-wrap mb-30">
+                                            <div class="product-img-action-wrap">
+                                                <div class="product-img product-img-zoom">
+                                                    <a href="/productDetails/?id=<%= product._id%>">
+                                                        <img class="default-img" src="/uploads/<%=product.image[0]%>" alt="">
+                                                    </a>
+                                                </div>  
+                                                <div class="product-badges product-badges-position product-badges-mrg">
+                                                    <span class="hot">Hot</span>
                                                 </div>
                                             </div>
-                                  
-                                
-                            </div>
-                            <%}%>
-                            <%})%>
-                            <%}%>
+                                            <div class="product-content-wrap">
+                                                <h2><a href="#"><%=product.ProductName%></a></h2>
+                                                <div class="product-price">
+                                                    <% if(product.offerPrice != 0) { %>
+                                                        <span>Rs.<%=product.offerPrice%> </span>
+                                                        <span class="old-price">Rs.<%=product.price%></span>
+                                                    <% } else { %>
+                                                        <span>Rs.<%=product.price%></span>
+                                                    <% } %>
+                                                </div>
+                                                <div class="product-action-1 show">
+                                                    <button aria-label="Add To Cart" id="cart" class="action-btn hover-up" onclick="addToCart('<%= product._id%>')">
+                                                        <i class="fi-rs-shopping-bag-add"></i>
+                                                    </button> 
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% }); %>
+                            <% } %>
                         </div>
                         <!--End product-grid-4-->
                     </div>
@@ -305,7 +304,7 @@
         </div>
     </footer>
     <!-- Preloader Start -->
-    <div id="preloader-active">
+    <!-- <div id="preloader-active">
         <div class="preloader d-flex align-items-center justify-content-center">
             <div class="preloader-inner position-relative">
                 <div class="text-center">
@@ -318,7 +317,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <script>
         function addToCart(id){
@@ -338,6 +337,20 @@
             })
         }
         
+        function nextPage(currentPage,totalPages){
+            console.log("next")
+            let page = parseInt(currentPage);
+            let totalPage = parseInt(totalPages);
+            if(page < totalPage){
+                window.location.href=`/home?page=${page+1}`
+            }       
+        }
+        function prevPage(currentPage,totalPages){
+            let page = parseInt(currentPage);
+            if(page > 1){
+                window.location.href=`/home?page=${page-1}`
+            }
+        }
     </script>
     <!-- Vendor JS-->
     <script src="/public/user/js/vendor/modernizr-3.6.0.min.js"></script>
@@ -363,6 +376,41 @@
     <!-- Template  JS -->
     <script src="/public/user/js/maind134.js?v=3.4"></script>
     <script src="/public/user/js/shopd134.js?v=3.4"></script>
+    <!-- <script>
+        function addToCart(id){
+            console.log('cart')
+            console.log(id)
+            fetch(`/addToCart?id=${id}`,{
+                method: 'POST',
+                headers:{
+                    'Content-Type':'application/json',
+                }
+            })
+            .then(resonse=>{
+                console.log(resonse)
+            })
+            .catch(error=>{
+                console.log(error)
+            })
+        }
+        
+        function nextPage(currentPage,totalPages){
+            console.log("next")
+            let page = parseInt(currentPage);
+            let totalPages = parseInt(totalPages);
+            if(page <= totalPages){
+                console.log('next')
+                window.location.href=`/home?page=${page+1}`
+            }       
+        }
+        function prevPage(currentPage,totalPages){
+            let page = parseInt(currentPage);
+            let totalPages = parseInt(totalPages);
+            if(page > 1){
+                window.location.href=`/home?page=${page-1}`
+            }
+        }
+    </script> -->
 </body>
 
 

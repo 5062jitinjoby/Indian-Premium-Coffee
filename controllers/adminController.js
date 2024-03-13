@@ -1,5 +1,6 @@
 const Admin = require('../models/admin')
 const User = require('../models/user')
+const Orders = require('../models/orders')
 
 const adminController ={
 
@@ -29,8 +30,13 @@ const adminController ={
     },
 
     //admin dashboard
-    home:(req,res)=>{
-        res.render('admin/home')
+    home:async(req,res)=>{
+        const all_Orders = await Orders.find().populate('userID');
+        let order_count =0;
+        all_Orders.forEach(orders=>{
+            order_count += orders.orders.length;
+        })
+        res.render('admin/home',{all_Orders,order_count})
     },
 
     view_users:async(req,res)=>{

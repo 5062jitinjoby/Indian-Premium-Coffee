@@ -1,6 +1,7 @@
 const Flavour = require('../models/flavour')
 const Product = require('../models/products')
 const Category = require('../models/category')
+const ProductOffer = require('../models/productOffer')
 const fs = require('fs').promises
 const path = require('path')
 
@@ -89,6 +90,70 @@ const products = {
             console.log(error.message)
         }
     },
+    //offer
+    product_Offer:async(req,res)=>{
+        try{
+            const productID = req.query.id;
+            const product = await Product.findOne({_id:productID}).populate('category')
+            console.log(product);
+            res.render('admin/productOffer',{product})
+        }
+        catch(error){
+            console.log(error.message);
+        }
+    },
+    post_product_Offer:async(req,res)=>{
+        try{
+            const productID = req.body.productID;
+            const check = await ProductOffer.findOne({product:productID})
+            const product = await Product.findOne({_id:productID});
+            const offer = req.body.offer;
+            if(!check){
+                const product_Offer = await ProductOffer.create({product:productID,offer:offer})
+                if(product.offerPrice != 0){
+                    const offer_price = product.price*(offer/100)
+                    const product_offer_price = product.price - offer_price
+                    if(product.offerPrice > product_offer_price){
+                        product.offerPrice = product.price - offer_price
+                        await product.save()
+                    }
+                }
+                res.redirect('/admin/productList') 
+            }
+        }
+        catch(error){
+            console.log(error.message)
+        }
+    },
+    product_OfferList:async(req,res)=>{
+        try{
+            const product_OfferList = await ProductOffer.find().populate('product')
+            console.log(product_OfferList)
+            res.render('admin/product_offerlist',{product_OfferList})
+        }
+        catch(error){
+            console.log(error.message);
+        }
+    },
+    del_ProductOffer:async(req,res)=>{
+        try{
+            const productID = req.query.id;
+            const product_Offer = await ProductOffer.findOne({product:productID})
+            const product = await Product.findOne({_id:productID})
+            const offer_price = product.price*(product_Offer.offer/100)
+            const product_offer_price = product.price - offer_price
+            if(product.offerPrice == product_offer_price){
+                product.offerPrice = 0
+                 await product.save()
+            }
+            await ProductOffer.findOneAndDelete({product:productID})
+            res.redirect('/admin/product_OfferList')
+        }
+        catch(error){
+            console.log(error.message)
+        }
+    },
+    
     //status setting
     productStatus: async (req, res) => {
         try {

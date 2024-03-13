@@ -21,53 +21,7 @@
 
 <body>
     <div class="screen-overlay"></div>
-    <aside class="navbar-aside" id="offcanvas_aside">
-        <div class="aside-top">
-            <a href="index.html" class="brand-wrap">
-                <img src="/public/imgs/theme/logo.svg" class="logo" alt="Evara Dashboard">
-            </a>
-            <div>
-                <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
-            </div>
-        </div>
-        <nav>
-            <ul class="menu-aside">
-                <li class="menu-item">
-                    <a class="menu-link" href="/admin/home"> <i class="icon material-icons md-home"></i>
-                        <span class="text">Dashboard</span>
-                    </a>
-                </li>
-                <li class="menu-item ">
-                    <a class="menu-link" href="/admin/view_user"> <i class="icon material-icons md-person"></i>
-                        <span class="text">View User</span>
-                    </a>
-                </li>
-                <li class="menu-item has-submenu">
-                    <a class="menu-link" href="page-products-list.html"> <i class="icon material-icons md-shopping_bag"></i>
-                        <span class="text">Products</span>
-                    </a>
-                    <div class="submenu">
-                        <a href="/admin/productList">Product List</a>
-                        <a href="/admin/category">Categories</a>
-                        <a href="/admin/flavours">Flavours</a>
-                    </div>
-                    <li class="menu-item active">
-                        <a class="menu-link" href="/admin/orders"> <i class="icon material-icons md-shopping_cart"></i>
-                            <span class="text">Orders</span>
-                        </a>
-                    </li>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="/admin/addProduct"> <i class="icon material-icons md-add_box"></i>
-                        <span class="text">Add product</span>
-                    </a>
-                </li>
-            </ul>
-            <hr>
-            <br>
-            <br>
-        </nav>
-    </aside>
+    <%-include('adminNav.ejs')%>
     <main class="main-wrap">
         <header class="main-header navbar">
             <div class="col-search">
@@ -166,7 +120,6 @@
                                             <th>Price</th>
                                             <th>Status</th>
                                             <th>Date</th>
-                                            <th class="text-end"> Action </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -176,9 +129,9 @@
                                                     <tr>
                                                         <td><b><%= items.userID.username%></b></td>
                                                         <td><%= el.productID.ProductName%></td>
-                                                        <td>$<%= el.cost%></td>
+                                                        <td>Rs.<%= el.cost%></td>
                                                         <td>
-                                                            <%if(el.status == 'Canceled'){%>
+                                                            <%if(el.status == 'Cancelled'){%>
                                                                 <span class="badge rounded-pill alert-danger"><%= el.status%></span>
                                                             <%}
                                                             else{%>
@@ -187,17 +140,23 @@
 
                                                         </td>
                                                         <td><%= (new Date(item.date)).toLocaleDateString('en-GB') %></td>
+                                                        <td><a href="/admin/orders/orderDetails?id=<%= items.userID._id%>&prid=<%= el._id%>" class="btn btn-md rounded font-sm">View details</a></td>
                                                         <td class="text-end">
-                                                            
-                                                            <div class="dropdown">
-                                                                <a href="#" data-bs-toggle="dropdown"  class="btn btn-md rounded font-sm">Edit</a>
-                                                                <div class="dropdown-menu">
-                                                                    <a class="dropdown-item" href="/admin/orders/status?id=<%= items.userID._id%>&prid=<%= el._id%>&status=Placed" name="Placed">Placed</a>
-                                                                    <a class="dropdown-item" href="/admin/orders/status?id=<%= items.userID._id%>&prid=<%= el._id%>&status=Pending" name="Pending">Pending</a>
-                                                                    <a class="dropdown-item" href="/admin/orders/status?id=<%= items.userID._id%>&prid=<%= el._id%>&status=Delivered" name="Delivered">Delevered</a>
-                                                                    <a class="dropdown-item text-danger" href="/admin/orders/status?id=<%= items.userID._id%>&prid=<%= el._id%>&status=Canceled" name="Cancel">Cancel</a>
-                                                                </div>
-                                                            </div> <!-- dropdown //end -->
+                                                            <%if(el.status == 'Placed'){%>
+                                                                <div class="dropdown">
+                                                                    <a data-bs-toggle="dropdown"  class="btn btn-md rounded font-sm">Edit</a>
+                                                                    <div class="dropdown-menu">
+                                                                        <a class="dropdown-item" href="/admin/orders/status?id=<%= items.userID._id%>&prid=<%= el._id%>&status=Delivered" name="Delivered">Delevered</a>
+                                                                        <a class="dropdown-item text-danger" href="/admin/orders/status?id=<%= items.userID._id%>&prid=<%= el._id%>&status=Cancelled" name="Cancel">Cancel</a>
+                                                                    </div>
+                                                                </div> <!-- dropdown //end -->
+                                                            <%}
+                                                            else if(el.status == 'Return Pending'){%>
+                                                                <a class="btn btn-md rounded font-sm" href="/admin/orders/status?id=<%= items.userID._id%>&prid=<%= el._id%>&status=<%= el.status%>" name="Delivered">Accept Return</a>
+                                                            <%}
+                                                            else{%>
+                                                                <p>No actions</p>
+                                                            <%}%>  
                                                         </td>
                                                     </tr>
                                                 <%})%>
