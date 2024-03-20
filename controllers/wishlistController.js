@@ -2,6 +2,7 @@ const User = require('../models/user')
 const Products = require('../models/products');
 const Wishlist = require('../models/wishlist')
 const Cart = require('../models/cart')
+const mongoose = require('mongoose')
 
 const wishlistController = {
     wishlist:async(req,res)=>{
@@ -52,9 +53,19 @@ const wishlistController = {
         try{
             const productID = req.query.id
             const userID = req.session.user;
+            console.log(userID)
             const cart = await Cart.findOne({userID:userID})
             const products = await Products.findOne({_id:productID})
-            const cost = products.cost;
+            let cost;
+            if(products.offerPrice){
+                if(products.offerPrice!=0){
+                    cost = products.offerPrice;
+                }
+            }
+            else{
+                cost = products.price;
+            }
+            console.log(cost)
             const wishlist = await Wishlist.findOne({userID:userID})
             const wishlistProduct = wishlist.products.filter(product=>product.productID==productID)
             if(wishlistProduct[0].stockStatus == 'In Stock'){
@@ -63,19 +74,31 @@ const wishlistController = {
                     if(productToUpdate.length == 0){
                         const updateCart = await Cart.findOneAndUpdate({userID:userID},
                             {$push:{products:{productID:productID,quantity:1,cost:cost}}},{new:true})
+                        updateCart.billTotal = updateCart.billTotal + cost;
+                        updateCart.subTotal = updateCart.subTotal + cost;
+                        await updateCart.save()
                     }
                 }
                 else{
-                    const updateCart = await Cart.create({userID:userID,
-                        products:{productID:productID,quantity:1,cost:cost}},{new:true})
+                    console.log("enenen");
+                    console.log(userID);
+                    const updateCart = await Cart.create({userID: new mongoose.Types.ObjectId(userID),
+                        products:[{productID:productID,quantity:1,cost:cost}]})
+                    updateCart.billTotal = cost;
+                    updateCart.subTotal = cost;
+                    await updateCart.save()
                 }
+                console.log("out");
                 wishlist.products.forEach(product=>{
+                    console.log(product.productID,productID);
                     if(product.productID == productID){
                         wishlist.products.pull(product);
                     }
                 })
-                wishlist.save();
+                
+                await wishlist.save();
             } 
+            res.json({success:true})
         }
         catch(error){
             console.log(error.message)
@@ -91,7 +114,8 @@ const wishlistController = {
                     wishlist.products.pull(product);
                 }
             })
-            wishlist.save();
+            await wishlist.save();
+            res.json({success:true})
         }
         catch(error){
             console.log(error.message)

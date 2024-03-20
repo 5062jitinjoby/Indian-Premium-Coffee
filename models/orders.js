@@ -20,8 +20,10 @@ const orderSchema = new mongoose.Schema({
       coupon: { type: mongoose.Schema.Types.ObjectId, ref: "Coupons" },
       couponCode: { type: String },
       orderId: { type: String, required: true },
+      payment:{type:String}
     },
   ],
 });
 
 module.exports = mongoose.model("Orders", orderSchema);
+  

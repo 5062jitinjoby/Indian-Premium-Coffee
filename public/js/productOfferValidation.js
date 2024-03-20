@@ -7,3 +7,12 @@ function validateOffer(){
     offerError.innerHTML='<i class="fa-solid fa-check"></i>';
     return true;
 }
+function validate_Product_Offer(event){
+    validateOffer()
+    if(!validateOffer()){
+        event.preventDefault()
+        var submitError = document.getElementById('submitError');
+        submitError.innerHTML="Please fix these error to submit ";
+        return false
+    }
+}

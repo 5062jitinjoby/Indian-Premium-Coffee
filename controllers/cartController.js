@@ -105,7 +105,10 @@ const cart = {
             let cost;
             const cart = await Cart.findOne({userID:usid}).populate('coupon')
             const quantity = 1;
-            const minPurchase = cart.coupon.minAmount
+            let minPurchase;
+            if(cart.coupon!=null){
+                minPurchase = cart.coupon.minAmount;
+            } 
             const cartPrdct = cart.products.filter(el=>el.productID==prid)
             let cartQty;
             cartPrdct.forEach(el=>{ cartQty = el.quantity})
@@ -153,7 +156,7 @@ const cart = {
             const cart = await Cart.findOne({userID:usid}).populate('products.productID')
             const address = await Address.findOne({userID:usid})
             console.log(cart)
-            res.render('user/checkout',{cart,address,user})
+            res.render('user/checkout',{cart,address,user,message:''})
         }
         catch(error){
             console.log(error.message)
