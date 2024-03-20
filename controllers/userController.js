@@ -4,9 +4,21 @@ const Products = require('../models/products')
 const Category = require('../models/category')
 const Address = require('../models/address')
 const Orders = require('../models/orders')
+const Wallet = require('../models/wallet')
 const getotp = require('../otp')
 const bcrypt = require('bcrypt')
 const saltround=10;
+
+function generateReferralCode(length) {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let referralCode = '';
+    
+    for (let i = 0; i < length; i++) {
+      referralCode += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    
+    return referralCode;
+}
 
 const userController ={
     //login
@@ -51,14 +63,18 @@ const userController ={
                 res.render('user/signup',{message:'User already exists'})
             }
             else{
-
+                const uniqueReferralCode = generateReferralCode(8);
                 let data = {
                 username:req.body.username,
                 password:await bcrypt.hash(req.body.password,saltround),
                 email:req.body.email,
-                phoneNumber:req.body.phoneNumber
+                phoneNumber:req.body.phoneNumber,
+                referalCode:uniqueReferralCode
                 }
                 const userData = await User.create(data)
+                if(req.body.referal){
+                    req.session.referal = req.body.referal;
+                }
                 const uid = userData._id;
                 res.redirect(`/otp?uid=${uid}`)
             }
@@ -87,10 +103,53 @@ const userController ={
     postOtp:async(req,res)=>{
         let otp = req.session.otp;
         let uid = req.session.uid;
-        let data = User.findOne({_id:uid})
+        let data = await User.findOne({_id:uid})
         try{
             if(otp == req.body.otp){
                 await User.updateOne({_id:uid},{$set:{isActive:true}})
+                if(req.session.referal){
+                    const newWallet = {
+                        userID: uid,
+                        balance: 50,
+                        transactions: [
+                          {
+                            transactionID: 'refer',
+                            transactionType: "Referal",
+                            date: new Date(),
+                            amount: 50,
+                          },
+                        ],
+                    };
+                    await Wallet.create(newWallet);
+                    const referedUser = await User.findOne({referalCode:req.session.referal})
+                    const referedUserWallet = await Wallet.findOne({userID:referedUser._id})
+                    if(referedUserWallet){
+                        referedUserWallet.balance = referedUserWallet.balance + 50;
+                        const transaction = {
+                        transactionID: 'refer',
+                        transactionType: "Referal",
+                        date: new Date(),
+                        amount: 50,
+                        };
+                        referedUserWallet.transactions.push(transaction);
+                        await referedUserWallet.save();
+                    }
+                    else{
+                        const referWallet = {
+                            userID: referedUser._id,
+                            balance: 50,
+                            transactions: [
+                              {
+                                transactionID: 'refer',
+                                transactionType: "Referal",
+                                date: new Date(),
+                                amount: 50,
+                              },
+                            ],
+                        };
+                        await Wallet.create(referWallet);  
+                    }
+                }
                 res.redirect('/login') 
             }
             else{

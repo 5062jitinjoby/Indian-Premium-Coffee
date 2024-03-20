@@ -4,6 +4,7 @@ const categories = require('../controllers/categoryController')
 const products = require('../controllers/productController')
 const orderController = require('../controllers/orderController')
 const couponController = require('../controllers/couponController')
+const statisticsController = require('../controllers/statistics')
 const router = express()
 const adminware = require('../middleware/adminware')
 const multer = require('multer')
@@ -18,7 +19,7 @@ router.post('/login', adminController.postLogin)
 
 router.get('/logout', adminController.logout)
 
-router.get('/home', adminware.adminLogin, adminController.home)
+router.get('/home', adminware.adminLogin, statisticsController.home)
 
 router.get('/view_user', adminware.adminLogin, adminController.view_users)
 router.get('/user_Status', adminware.adminLogin, adminController.user_Status)
@@ -65,8 +66,10 @@ router.get('/del_coupon',adminware.adminLogin,couponController.del_coupon)
 
 router.get('/productList', adminware.adminLogin, products.getListProducts)
 
-router.post('/getcustomReport',adminware.adminLogin,orderController.getcustomReport)
-router.get('/reportInExcel',adminware.adminLogin,orderController.salesReportinExcel)
-router.get('/reportInPdf',adminware.adminLogin,orderController.salesReportinPdf)
+router.post('/getcustomReport',adminware.adminLogin,statisticsController.getcustomReport)
+router.get('/reportInExcel',adminware.adminLogin,statisticsController.salesReportinExcel)
+router.get('/reportInPdf',adminware.adminLogin,statisticsController.salesReportinPdf)
+router.get('/topSelling',adminware.adminLogin,statisticsController.topSelling)
+router.get('/topSellingCategory',adminware.adminLogin,statisticsController.topSellingCategory)
 
 module.exports = router;

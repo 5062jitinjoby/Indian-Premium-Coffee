@@ -7,7 +7,10 @@ function moveToCart(id){
         }
     })
     .then(resonse=>{
-        console.log(resonse)
+        return resonse.json()
+    }).then(data=>{
+        console.log(data)
+        window.location.reload()
     })
     .catch(error=>{
         console.log(error)
@@ -23,7 +26,10 @@ function remove(id){
         }
     })
     .then(resonse=>{
-        console.log(resonse)
+        return resonse.json()
+    }).then(data=>{
+        console.log(data)
+        window.location.reload()
     })
     .catch(error=>{
         console.log(error)
