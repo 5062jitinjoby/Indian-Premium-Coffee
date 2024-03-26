@@ -12,9 +12,9 @@ const sendEmail = (email,otp)=>{
             user:process.env.EMAIL,
             pass:process.env.PASS
         }
-    })
+    })  
 
-    const mailOptions = {
+    const mailOptions = {   
         from:'indianpremiumcoffee@gmail.com',
         to:email,
         subject:'E-mail verification code',

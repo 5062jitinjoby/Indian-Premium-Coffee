@@ -156,7 +156,12 @@ const cart = {
             const cart = await Cart.findOne({userID:usid}).populate('products.productID')
             const address = await Address.findOne({userID:usid})
             console.log(cart)
-            res.render('user/checkout',{cart,address,user,message:''})
+            if(req.session.errorMessage){
+                res.render('user/checkout',{cart,address,user,message:req.session.errorMessage})
+            }
+            else{
+                res.render('user/checkout',{cart,address,user,message:''})
+            }
         }
         catch(error){
             console.log(error.message)
