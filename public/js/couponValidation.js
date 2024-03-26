@@ -27,6 +27,7 @@ function validateDate() {
     const dateString = dateInput.value;
     const isValid = dateString && isValidDate(dateString);
     dateError.textContent = isValid ? '' : 'Invalid date. Please use the format YYYY-MM-DD.';
+    return isValid;
 }
 
 function isValidDate(dateString) {
@@ -35,10 +36,14 @@ function isValidDate(dateString) {
 }
 
 function validateDiscount(){
-    var priceField = document.getElementById('price').value
-    const discountPrice = document.getElementById('discountPrice').value
+    var priceField = parseInt(document.getElementById('price').value)
+    const discountPrice = parseInt(document.getElementById('discountPrice').value)
     if(!validateMinPurchase()){
         discountError.innerHTML = 'Enter Minimum Purchase';
+        return false;
+    }
+    if(!discountPrice){
+        discountError.innerHTML = 'Enter discount';
         return false;
     }
     if(discountPrice>=priceField){
@@ -55,8 +60,21 @@ function validateAddCoupon(event){
     validateMinPurchase();
     validateDate();
     validateDiscount();
+    if(!validateCoupon()){
+        console.log('Coupon failed')
+    }
+    if(!validateMinPurchase()){
+        console.log('Minnimum purchase failed')
+    }
+    if(!validateDate()){
+        console.log(validateDate())
+    }
+    if(!validateDiscount()){
+        console.log('Discount failed')
+    }
 
     if(!validateCoupon() || !validateMinPurchase() || !validateDate() || !validateDiscount()){
+        console.log('prevent')
         event.preventDefault()
         var submitError = document.getElementById('submitError');
         submitError.innerHTML="Please fix these error to submit ";

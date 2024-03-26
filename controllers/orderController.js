@@ -52,7 +52,7 @@ const orderController = {
         });
         console.log(placedAddress);
         if (payment == "COD" && cart.billTotal <= 1000) {
-            if (order) {
+          if (order) {
             if (cart.coupon != null) {
                 const updatedOrder = await Orders.findOneAndUpdate(
                 { userID: usid },
@@ -94,7 +94,7 @@ const orderController = {
                 { new: true }
                 );
             }
-            } 
+          } 
             else {
                 if (cart.coupon != null) {
                     const updatedOrder = await Orders.create(
@@ -135,9 +135,26 @@ const orderController = {
                     );
                 }
             }
+            const delCart = await Cart.findOneAndDelete({ userID: usid });
+            for (let order_product of cart.products) {
+              for (let product of products) {
+                  
+              if (order_product.productID.equals(product._id)) {
+                  product.quantity = product.quantity - order_product.quantity;
+                  await product.save();
+              }
+              }
+            }
+            if (cart.coupon != null) {
+              user.coupons.push(cart.coupon);
+              await user.save();
+            }
+  
+            res.render("user/order", { user });
         } 
         else if (payment == "Razorpay") {
             if (order) {
+              console.log('razorpayOrder')
                 if (cart.coupon != null) {
                     const updatedOrder = await Orders.findOneAndUpdate(
                     { userID: usid },
@@ -221,6 +238,21 @@ const orderController = {
                     );
                 }
             }
+            const delCart = await Cart.findOneAndDelete({ userID: usid });
+            for (let order_product of cart.products) {
+              for (let product of products) {
+                  
+              if (order_product.productID.equals(product._id)) {
+                  product.quantity = product.quantity - order_product.quantity;
+                  await product.save();
+              }
+              }
+            }
+            if (cart.coupon != null) {
+              user.coupons.push(cart.coupon);
+              await user.save();
+            }
+            res.render("user/order", { user });
         }
         else{
           const usid = req.session.user;
@@ -228,25 +260,10 @@ const orderController = {
           const products= await Products.find({})
           const cart = await Cart.findOne({userID:usid}).populate('products.productID')
           const address = await Address.findOne({userID:usid})
-          res.render('user/checkout',{cart,address,user,message:'For bill amount above 1000 choose Online payment'})
-        }
-        if (cart.coupon != null) {
-            user.coupons.push(cart.coupon);
-            await user.save();
+          req.session.errorMessage = 'For bill amount above 1000 choose Online payment'
+          res.redirect('/checkout')
         }
         console.log(cart)
-        for (let order_product of cart.products) {
-            for (let product of products) {
-                
-            if (order_product.productID.equals(product._id)) {
-                product.quantity = product.quantity - order_product.quantity;
-                await product.save();
-            }
-            }
-        }
-        const delCart = await Cart.findOneAndDelete({ userID: usid });
-
-        res.render("user/order", { user });
         } catch (error) {
         console.log(error);
         }
@@ -256,15 +273,25 @@ const orderController = {
       // console.log('hi orders')
       const uid = req.session.user;
       const user = await User.findOne({ _id: uid });
-      const orders = await Orders.findOne({ userID: uid }).populate(
+      const order = await Orders.findOne({ userID: uid }).sort({"orders.date":-1}).populate(
         "orders.products.productID"
       );
-      // if(orders){
-      //     const reqorder = orders.orders.map(pr=>{
-      //         console.log(pr)
-      //     })
-      // }
-      res.render("user/userOrders", { orders, user });
+      let orders = [];
+      if(order){
+          order.orders.forEach(pr=>{
+              orders.push(pr);
+          })
+      }
+      const currentPage = req.query.page || 1;
+      const pageLimit = 5;
+      const start = (currentPage - 1) * pageLimit;
+      const end = currentPage * pageLimit;
+      const startIndex = orders.length - start;
+      const endIndex = orders.length - end<0?0:orders.length - end
+      const totalPages = Math.ceil( orders.length/ pageLimit);
+      orders = orders.slice(endIndex,startIndex)
+      console.log(orders[0].date)
+      res.render("user/userOrders", { orders, user, currentPage,  totalPages});
     } catch (error) {
       console.log(error.message);
     }
@@ -599,6 +626,7 @@ const orderController = {
                     couponCode: cart.coupon.couponCode,
                     paymentMethod: "Net Banking",
                     orderId: orderID,
+                    payment: 'Pending'
                     },
                 ],
                 },
@@ -619,6 +647,7 @@ const orderController = {
                     billAmount: cart.billTotal,
                     paymentMethod: "Net Banking",
                     orderId: orderID,
+                    payment: 'Pending'
                     },
                 ],
                 },
@@ -642,6 +671,7 @@ const orderController = {
                       couponCode: cart.coupon.couponCode,
                       paymentMethod: "Net Banking",
                       orderId: orderID,
+                      payment: 'Pending'
                   },
                   ],
               },
