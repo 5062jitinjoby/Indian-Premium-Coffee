@@ -43,15 +43,17 @@ const adminController ={
         try {
             const id = req.query.id
             const user = await User.findOne({ _id: id })
-            let status;
-            if (user.isActive == true) {
-                status = false
-            }
-            else {
-                status = true
-            }
-            console.log(status)
-            await User.findByIdAndUpdate({ _id: id }, { $set: { isActive: status } })
+            user.isActive = !user.isActive;
+            await user.save();
+            // let status;
+            // if (user.isActive == true) {
+            //     status = false
+            // }
+            // else {
+            //     status = true
+            // }
+            // console.log(status)
+            // await User.findByIdAndUpdate({ _id: id }, { $set: { isActive: status } })
             res.redirect('/admin/view_user')
         }
         catch (error) {
